@@ -45,7 +45,7 @@
 
             showSlide(currentSlide + 1);
 
-        }, 2000); //
+        }, 15000); //
 
     </script>
 
