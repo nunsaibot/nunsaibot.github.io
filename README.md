@@ -5,43 +5,7 @@
 #                                                 [-MEGA MEM -](https://youtu.be/ZfqYReML_5c?si=0JRmEHo86bsGxU4L)
 
 
-<!DOCTYPE html>
 
-<html>
-
-<head>
-
-    <style>
-
-        .slideshow {
-
-            position: relative;
-
-            max-width: 100%;
-
-            max-height: 100%;
-
-        }
-
-
-
-        .slide {
-
-            display: none;
-
-            position: absolute;
-
-            top: 0;
-
-            left: 0;
-
-            width: 100%;
-
-            height: 100%;
-
-        }
-
-    </style>
 
 </head>
 
