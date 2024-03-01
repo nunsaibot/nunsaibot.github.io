@@ -66,8 +66,8 @@
             Choose a link
         </div>
         <div class="select-items" style="display: none;">
-            <div onclick="location.href='https://example.com/page1'">Link 1</div>
-            <div onclick="location.href='https://example.com/page2'">Link 2</div>
+            <div onclick="location.href='https://example.com/page1'">[https://dzen.ru/?clid=2359102&yredirect=true]</div>
+            <div onclick="location.href='https://example.com/page2'">https://dzen.ru/?clid=2359102&yredirect=true</div>
             <div onclick="location.href='https://example.com/page3'">Link 3</div>
         </div>
     </div>
