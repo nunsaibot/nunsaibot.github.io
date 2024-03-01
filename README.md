@@ -1,5 +1,3 @@
-```html
-<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -138,4 +136,3 @@ TagName("option")[j].innerHTML;
 </body>
 
 </html>
-```
