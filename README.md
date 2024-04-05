@@ -1,4 +1,3 @@
----
 #  WELCOME TO SUPER CLUB MEMES
 ![Logo club memes](http://i.yapx.ru/Tyrz9.gif)
 # INFO TO CLUB
