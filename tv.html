@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INTELEKTUAL TV</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #000000;
+        }
+        svg {
+            border: 1px solid black;
+            padding: 20px;
+        }
+        /* Анимация для линий */
+        @keyframes growLine {
+            from { stroke-dasharray: 0; }
+            to { stroke-dasharray: 100%; }
+        }
+        /* Анимация для кругов */
+        @keyframes growCircle {
+            from { r: 0; }
+            to { r: 35; }
+        }
+        /* Анимация для прямоугольников */
+        @keyframes growRect {
+            from { width: 0; height: 0; }
+            to { width: 100%; height: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <svg id="canvas" width="1280" height="720"></svg>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const shapes = ['line', 'circle', 'rect'];
+        const colors = ['#e74c3c', '#3498db', '#2ecc71', '#9b59b6', '#f1c40f', '#34495e', '#00FF00','#90EE90','#808000', '#FF1493', '#FF4500', '#FFD700', '#FFFF00', '#4B0082', '#7B68EE'];
+
+        // Функция для воспроизведения случайного звука
+        function playRandomSound() {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+            // Случайный выбор типа звука
+            const soundType = Math.floor(Math.random() * 4); // 0-3: тон, шум, аккорд, эффект
+
+            switch (soundType) {
+                case 0:
+                    playRandomTone(audioContext); // Случайный тон
+                    break;
+                case 1:
+                    playRandomNoise(audioContext); // Случайный шум
+                    break;
+                case 2:
+                    playRandomChord(audioContext); // Случайный аккорд
+                    break;
+                case 3:
+                    playRandomEffect(audioContext); // Случайный эффект
+                    break;
+            }
+        }
+
+        // Функция для воспроизведения случайного тона
+        function playRandomTone(audioContext) {
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+
+            oscillator.type = ['sine', 'square', 'triangle', 'sawtooth'][Math.floor(Math.random() * 4)]; // Случайный тип волны
+            oscillator.frequency.setValueAtTime(Math.random() * 1000 + 100, audioContext.currentTime); // Случайная частота (100-1100 Гц)
+            gainNode.gain.setValueAtTime(0.5, audioContext.currentTime); // Громкость
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            oscillator.start();
+            oscillator.stop(audioContext.currentTime + 0.5 + Math.random() * 1); // Случайная длительность (0.5-1.5 секунды)
+        }
+
+        // Функция для воспроизведения случайного шума
+        function playRandomNoise(audioContext) {
+            const bufferSize = 4096;
+            const noiseBuffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
+            const output = noiseBuffer.getChannelData(0);
+
+            for (let i = 0; i < bufferSize; i++) {
+                output[i] = Math.random() * 2 - 1; // Генерация белого шума
+            }
+
+            const noiseSource = audioContext.createBufferSource();
+            noiseSource.buffer = noiseBuffer;
+
+            const gainNode = audioContext.createGain();
+            gainNode.gain.setValueAtTime(0.1, audioContext.currentTime); // Громкость
+
+            noiseSource.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            noiseSource.start();
+            noiseSource.stop(audioContext.currentTime + 0.5 + Math.random() * 1); // Случайная длительность (0.5-1.5 секунды)
+        }
+
+        // Функция для воспроизведения случайного аккорда
+        function playRandomChord(audioContext) {
+            const frequencies = [
+                261.63, 329.63, 392.00, // C4, E4, G4 (мажорный аккорд)
+                293.66, 369.99, 440.00, // D4, F#4, A4 (мажорный аккорд)
+                329.63, 415.30, 493.88  // E4, G#4, B4 (мажорный аккорд)
+            ];
+
+            const chord = [];
+            for (let i = 0; i < 3; i++) {
+                chord.push(frequencies[Math.floor(Math.random() * frequencies.length)]); // Случайные ноты из списка
+            }
+
+            chord.forEach(freq => {
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+
+                oscillator.type = ['sine', 'square', 'triangle', 'sawtooth'][Math.floor(Math.random() * 4)]; // Случайный тип волны
+                oscillator.frequency.setValueAtTime(freq, audioContext.currentTime); // Частота ноты
+                gainNode.gain.setValueAtTime(0.2, audioContext.currentTime); // Громкость
+
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+
+                oscillator.start();
+                oscillator.stop(audioContext.currentTime + 1 + Math.random() * 1); // Случайная длительность (1-2 секунды)
+            });
+        }
+
+        // Функция для воспроизведения случайного эффекта (например, "пинг")
+        function playRandomEffect(audioContext) {
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+
+            oscillator.type = 'square'; // Тип волны
+            oscillator.frequency.setValueAtTime(1000, audioContext.currentTime); // Начальная частота
+            oscillator.frequency.exponentialRampToValueAtTime(100, audioContext.currentTime + 0.2); // Эффект снижения частоты
+            gainNode.gain.setValueAtTime(0.5, audioContext.currentTime); // Громкость
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2); // Эффект затухания
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            oscillator.start();
+            oscillator.stop(audioContext.currentTime + 0.3); // Длительность эффекта
+        }
+
+        function generateShape() {
+            const shapeType = shapes[Math.floor(Math.random() * shapes.length)];
+            const color = colors[Math.floor(Math.random() * colors.length)];
+
+            switch(shapeType) {
+                case 'line':
+                    const x1 = Math.random() * 1280;
+                    const y1 = Math.random() * 720;
+                    const x2 = Math.random() * 1280;
+                    const y2 = Math.random() * 720;
+                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    line.setAttribute('x1', x1);
+                    line.setAttribute('y1', y1);
+                    line.setAttribute('x2', x2);
+                    line.setAttribute('y2', y2);
+                    line.setAttribute('stroke', color);
+                    line.setAttribute('stroke-width', Math.random() * 10 + 1);
+                    line.style.animation = 'growLine 1s forwards';
+                    canvas.appendChild(line);
+                    break;
+                case 'circle':
+                    const cx = Math.random() * 1280;
+                    const cy = Math.random() * 720;
+                    const r = 35;
+                    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                    circle.setAttribute('cx', cx);
+                    circle.setAttribute('cy', cy);
+                    circle.setAttribute('r', r);
+                    circle.setAttribute('fill', color);
+                    circle.style.animation = 'growCircle 1s forwards';
+                    canvas.appendChild(circle);
+                    break;
+                case 'rect':
+                    const rx = Math.random() * 1280;
+                    const ry = Math.random() * 720;
+                    const w = Math.random() * 80 + 20;
+                    const h = Math.random() * 80 + 20;
+                    const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                    rect.setAttribute('x', rx);
+                    rect.setAttribute('y', ry);
+                    rect.setAttribute('width', w);
+                    rect.setAttribute('height', h);
+                    rect.setAttribute('fill', color);
+                    rect.style.animation = 'growRect 1s forwards';
+                    canvas.appendChild(rect);
+                    break;
+            }
+
+            // Воспроизводим случайный звук при создании фигуры
+            playRandomSound();
+        }
+
+        setInterval(generateShape, 1000); // Вызываем функцию каждую секунду
+    </script>
+</body>
+</html>
