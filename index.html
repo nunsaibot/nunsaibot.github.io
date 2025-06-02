@@ -8,7 +8,7 @@
             margin: 0;
             padding: 0;
             background: 
-                <img src="Dudes1.gif">no-repeat left top,
+                url('Dudes1.gif') no-repeat left top,
                 #1a1a1a;
             background-size: 550px 100%;
             min-height: 100vh;
@@ -17,8 +17,8 @@
         }
         
         .content {
-            margin-left: 0px; /* Отступ от левого фона */
-            padding: 10px;
+            margin-left: 570px; /* Отступ от левого фона (550px + 20px) */
+            padding: 20px;
         }
         
         /* Стили для ссылок, чтобы они выделялись на фоне */
@@ -52,14 +52,26 @@
             background: rgba(255, 204, 0, 0.2);
             transform: translateX(5px);
         }
+        
+        /* Центрирование заголовков */
+        h1 {
+            text-align: center;
+        }
+        
+        /* Центрирование изображения кофе */
+        .center-image {
+            text-align: center;
+        }
     </style>
 </head>
 <body>
     <div class="content">
-        <h1 align="center">●▬▬▬▬▬▬▬▬▬▬▬▬ஜ۩۞۩ஜ▬▬▬▬▬▬▬▬▬▬▬▬●</h1>
-        <h1 align="center">░░WELCOME░░</h1>
-        <h1 align="center">●▬▬▬▬▬▬▬▬▬▬▬▬ஜ۩۞۩ஜ▬▬▬▬▬▬▬▬▬▬▬▬●</h1>
-        <p align="center"><img src="coffe.gif"></p>
+        <h1>●▬▬▬▬▬▬▬▬▬▬▬▬ஜ۩۞۩ஜ▬▬▬▬▬▬▬▬▬▬▬▬●</h1>
+        <h1>░░WELCOME░░</h1>
+        <h1>●▬▬▬▬▬▬▬▬▬▬▬▬ஜ۩۞۩ஜ▬▬▬▬▬▬▬▬▬▬▬▬●</h1>
+        <div class="center-image">
+            <img src="coffe.gif" alt="Анимация кофе">
+        </div>
 
         <h2 id="also">Полезные ссылки</h2>
         <ul>
