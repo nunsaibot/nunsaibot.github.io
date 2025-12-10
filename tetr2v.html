@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тетрис - Классическая игра</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            max-width: 1000px;
+            justify-content: center;
+            align-items: flex-start;
+        }
+        
+        .game-header {
+            text-align: center;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            font-size: 3.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: #a5b1c2;
+            margin-bottom: 20px;
+        }
+        
+        .game-area {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .game-board-container {
+            position: relative;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        #game-board {
+            background-color: #0c2461;
+            display: block;
+            border: 3px solid #1e3799;
+        }
+        
+        .game-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            border-radius: 10px;
+        }
+        
+        .game-overlay h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: #ff6b6b;
+        }
+        
+        .game-overlay p {
+            font-size: 1.2rem;
+            margin-bottom: 25px;
+            text-align: center;
+            max-width: 80%;
+        }
+        
+        .side-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            min-width: 200px;
+        }
+        
+        .panel {
+            background: rgba(30, 55, 153, 0.7);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            border: 1px solid #4a69bd;
+        }
+        
+        .panel h2 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #feca57;
+            border-bottom: 2px solid #4a69bd;
+            padding-bottom: 8px;
+        }
+        
+        .score-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #48dbfb;
+            text-shadow: 0 0 10px rgba(72, 219, 251, 0.5);
+        }
+        
+        .level-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #ff9ff3;
+        }
+        
+        .next-piece-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+        }
+        
+        #next-piece {
+            background-color: rgba(12, 36, 97, 0.7);
+            border: 2px solid #4a69bd;
+        }
+        
+        .controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .control-key {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            padding: 8px;
+            text-align: center;
+            border: 1px solid #4a69bd;
+        }
+        
+        .key {
+            display: inline-block;
+            background: #0c2461;
+            padding: 3px 8px;
+            border-radius: 4px;
+            margin: 0 2px;
+            font-family: monospace;
+            border: 1px solid #4a69bd;
+        }
+        
+        button {
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            color: #1a1a2e;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+            margin: 5px;
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.6);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .btn-start {
+            background: linear-gradient(45deg, #48dbfb, #0abde3);
+            box-shadow: 0 5px 15px rgba(72, 219, 251, 0.4);
+        }
+        
+        .btn-start:hover {
+            box-shadow: 0 8px 20px rgba(72, 219, 251, 0.6);
+        }
+        
+        .btn-pause {
+            background: linear-gradient(45deg, #feca57, #ff9f43);
+            box-shadow: 0 5px 15px rgba(254, 202, 87, 0.4);
+        }
+        
+        .btn-pause:hover {
+            box-shadow: 0 8px 20px rgba(254, 202, 87, 0.6);
+        }
+        
+        .btn-restart {
+            background: linear-gradient(45deg, #ff9ff3, #f368e0);
+            box-shadow: 0 5px 15px rgba(255, 159, 243, 0.4);
+        }
+        
+        .btn-restart:hover {
+            box-shadow: 0 8px 20px rgba(255, 159, 243, 0.6);
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        .line-clear {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            opacity: 0;
+            z-index: 5;
+        }
+        
+        .clear-animation {
+            animation: lineClear 0.5s ease-out;
+        }
+        
+        @keyframes lineClear {
+            0% { 
+                background: rgba(255, 255, 255, 0.8);
+                opacity: 1;
+            }
+            100% { 
+                background: rgba(255, 255, 255, 0);
+                opacity: 0;
+            }
+        }
+        
+        .flash-effect {
+            animation: flash 0.3s;
+        }
+        
+        @keyframes flash {
+            0%, 100% { background-color: #0c2461; }
+            50% { background-color: #4a69bd; }
+        }
+        
+        /* Стили для мемов */
+        .meme-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s;
+        }
+        
+        .meme-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .meme-container {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            max-width: 500px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            transform: scale(0.8);
+            transition: transform 0.5s;
+        }
+        
+        .meme-overlay.active .meme-container {
+            transform: scale(1);
+        }
+        
+        .meme-title {
+            color: #2c3e50;
+            font-size: 2rem;
+            margin-bottom: 15px;
+        }
+        
+        .meme-image {
+            max-width: 100%;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .meme-description {
+            color: #7f8c8d;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+        
+        .close-meme {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+        }
+        
+        .achievements-panel {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .achievement {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+        }
+        
+        .achievement.unlocked {
+            background: rgba(46, 204, 113, 0.2);
+            border-left: 4px solid #2ecc71;
+        }
+        
+        .achievement-icon {
+            width: 30px;
+            height: 30px;
+            background: #3498db;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+        
+        .achievement.unlocked .achievement-icon {
+            background: #2ecc71;
+        }
+        
+        .achievement-text {
+            flex: 1;
+        }
+        
+        .achievement-title {
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        
+        .achievement-desc {
+            font-size: 0.8rem;
+            color: #a5b1c2;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            width: 100%;
+            color: #a5b1c2;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .side-panel {
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            .meme-container {
+                max-width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="game-header">
+            <h1>ТЕТРИС</h1>
+            <p class="subtitle">Классическая игра в современном исполнении</p>
+        </div>
+        
+        <div class="game-area">
+            <div class="game-board-container">
+                <canvas id="game-board" width="300" height="600"></canvas>
+                <div id="game-overlay" class="game-overlay">
+                    <h2>ТЕТРИС</h2>
+                    <p>Собери линии, чтобы заработать очки. Избегайте заполнения экрана!</p>
+                    <button id="start-btn" class="btn-start">Начать игру</button>
+                    <div class="controls" style="margin-top: 20px;">
+                        <div class="control-key">Влево: <span class="key">←</span></div>
+                        <div class="control-key">Вправо: <span class="key">→</span></div>
+                        <div class="control-key">Вращение: <span class="key">↑</span></div>
+                        <div class="control-key">Вниз: <span class="key">↓</span></div>
+                        <div class="control-key">Пауза: <span class="key">P</span></div>
+                        <div class="control-key">Пространство: <span class="key">␣</span></div>
+                    </div>
+                </div>
+                <div id="line-clear" class="line-clear"></div>
+            </div>
+            
+            <div class="side-panel">
+                <div class="panel">
+                    <h2>Счет</h2>
+                    <div class="score-value" id="score">0</div>
+                </div>
+                
+                <div class="panel">
+                    <h2>Уровень</h2>
+                    <div class="level-value" id="level">1</div>
+                </div>
+                
+                <div class="panel">
+                    <h2>Следующая фигура</h2>
+                    <div class="next-piece-container">
+                        <canvas id="next-piece" width="100" height="100"></canvas>
+                    </div>
+                </div>
+                
+                <div class="panel">
+                    <h2>Достижения</h2>
+                    <div class="achievements-panel" id="achievements">
+                        <div class="achievement" data-score="100">
+                            <div class="achievement-icon">100</div>
+                            <div class="achievement-text">
+                                <div class="achievement-title">Первый шаг</div>
+                                <div class="achievement-desc">Наберите 100 очков</div>
+                            </div>
+                        </div>
+                        <div class="achievement" data-score="500">
+                            <div class="achievement-icon">500</div>
+                            <div class="achievement-text">
+                                <div class="achievement-title">Набираем обороты</div>
+                                <div class="achievement-desc">Наберите 500 очков</div>
+                            </div>
+                        </div>
+                        <div class="achievement" data-score="1000">
+                            <div class="achievement-icon">1K</div>
+                            <div class="achievement-text">
+                                <div class="achievement-title">Тысячник</div>
+                                <div class="achievement-desc">Наберите 1000 очков</div>
+                            </div>
+                        </div>
+                        <div class="achievement" data-score="2000">
+                            <div class="achievement-icon">2K</div>
+                            <div class="achievement-text">
+                                <div class="achievement-title">Опытный игрок</div>
+                                <div class="achievement-desc">Наберите 2000 очков</div>
+                            </div>
+                        </div>
+                        <div class="achievement" data-score="5000">
+                            <div class="achievement-icon">5K</div>
+                            <div class="achievement-text">
+                                <div class="achievement-title">Мастер Тетриса</div>
+                                <div class="achievement-desc">Наберите 5000 очков</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="panel">
+                    <h2>Управление</h2>
+                    <div class="controls">
+                        <div class="control-key">Влево: <span class="key">←</span></div>
+                        <div class="control-key">Вправо: <span class="key">→</span></div>
+                        <div class="control-key">Вращение: <span class="key">↑</span></div>
+                        <div class="control-key">Вниз: <span class="key">↓</span></div>
+                        <div class="control-key">Пауза: <span class="key">P</span></div>
+                        <div class="control-key">Пространство: <span class="key">␣</span></div>
+                    </div>
+                </div>
+                
+                <div class="panel">
+                    <h2>Действия</h2>
+                    <button id="pause-btn" class="btn-pause">Пауза</button>
+                    <button id="restart-btn" class="btn-restart">Заново</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Оверлей для мемов -->
+        <div class="meme-overlay" id="meme-overlay">
+            <div class="meme-container">
+                <h2 class="meme-title" id="meme-title">Достижение разблокировано!</h2>
+                <img class="meme-image" id="meme-image" src="" alt="Мем">
+                <p class="meme-description" id="meme-description">Поздравляем с достижением!</p>
+                <button class="close-meme" id="close-meme">Продолжить игру</button>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Тетрис &copy; 2023 | Классическая головоломка</p>
+        </footer>
+    </div>
+
+    <script>
+        // Константы игры
+        const COLS = 10;
+        const ROWS = 20;
+        const BLOCK_SIZE = 30;
+        const COLORS = [
+            null,
+            '#FF0D72', // I
+            '#0DC2FF', // J
+            '#0DFF72', // L
+            '#F538FF', // O
+            '#FF8E0D', // S
+            '#FFE138', // T
+            '#3877FF'  // Z
+        ];
+        
+        // Фигуры тетриса
+        const SHAPES = [
+            null,
+            [
+                [0, 0, 0, 0],
+                [1, 1, 1, 1],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0]
+            ],
+            [
+                [2, 0, 0],
+                [2, 2, 2],
+                [0, 0, 0]
+            ],
+            [
+                [0, 0, 3],
+                [3, 3, 3],
+                [0, 0, 0]
+            ],
+            [
+                [4, 4],
+                [4, 4]
+            ],
+            [
+                [0, 5, 5],
+                [5, 5, 0],
+                [0, 0, 0]
+            ],
+            [
+                [0, 6, 0],
+                [6, 6, 6],
+                [0, 0, 0]
+            ],
+            [
+                [7, 7, 0],
+                [0, 7, 7],
+                [0, 0, 0]
+            ]
+        ];
+        
+        // Достижения и мемы
+        const ACHIEVEMENTS = [
+            { score: 100, 
+              title: "Первый шаг!", 
+              description: "Ты набрал 100 очков! Так держать!",
+              meme: "https://i.imgur.com/6Jqg3J2.png" 
+            },
+            { score: 500, 
+              title: "Набираем обороты!", 
+              description: "500 очков! Ты явно не новичок!",
+              meme: "https://i.imgur.com/6Jqg3J2.png" 
+            },
+            { score: 1000, 
+              title: "Тысячник!", 
+              description: "1000 очков! Отличный результат!",
+              meme: "https://i.imgur.com/6Jqg3J2.png" 
+            },
+            { score: 2000, 
+              title: "Опытный игрок!", 
+              description: "2000 очков! Ты настоящий профи!",
+              meme: "https://i.imgur.com/6Jqg3J2.png" 
+            },
+            { score: 5000, 
+              title: "Мастер Тетриса!", 
+              description: "5000 очков! Ты абсолютный чемпион!",
+              meme: "https://i.imgur.com/6Jqg3J2.png" 
+            }
+        ];
+        
+        // Элементы DOM
+        const canvas = document.getElementById('game-board');
+        const ctx = canvas.getContext('2d');
+        const nextCanvas = document.getElementById('next-piece');
+        const nextCtx = nextCanvas.getContext('2d');
+        const scoreElement = document.getElementById('score');
+        const levelElement = document.getElementById('level');
+        const startBtn = document.getElementById('start-btn');
+        const pauseBtn = document.getElementById('pause-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const gameOverlay = document.getElementById('game-overlay');
+        const lineClearElement = document.getElementById('line-clear');
+        const memeOverlay = document.getElementById('meme-overlay');
+        const memeTitle = document.getElementById('meme-title');
+        const memeImage = document.getElementById('meme-image');
+        const memeDescription = document.getElementById('meme-description');
+        const closeMemeBtn = document.getElementById('close-meme');
+        const achievementsContainer = document.getElementById('achievements');
+        
+        // Переменные игры
+        let board = createBoard();
+        let score = 0;
+        let level = 1;
+        let linesCleared = 0;
+        let dropCounter = 0;
+        let dropInterval = 1000;
+        let gameOver = false;
+        let isPaused = false;
+        let lastTime = 0;
+        let animationFrameId;
+        let unlockedAchievements = [];
+        
+        // Текущая и следующая фигура
+        let player = {
+            pos: {x: 0, y: 0},
+            matrix: null,
+            score: 0
+        };
+        
+        let nextPlayer = {
+            matrix: null
+        };
+        
+        // Инициализация игры
+        function init() {
+            // Установка размеров canvas
+            canvas.width = COLS * BLOCK_SIZE;
+            canvas.height = ROWS * BLOCK_SIZE;
+            nextCanvas.width = 4 * BLOCK_SIZE;
+            nextCanvas.height = 4 * BLOCK_SIZE;
+            
+            // Сброс состояния игры
+            resetGame();
+            
+            // Создание первой фигуры
+            resetPlayer();
+            
+            // Отрисовка начального состояния
+            draw();
+            
+            // Настройка обработчиков для мемов
+            closeMemeBtn.addEventListener('click', () => {
+                memeOverlay.classList.remove('active');
+            });
+        }
+        
+        // Создание игрового поля
+        function createBoard() {
+            return Array.from({length: ROWS}, () => Array(COLS).fill(0));
+        }
+        
+        // Сброс игры
+        function resetGame() {
+            board = createBoard();
+            score = 0;
+            level = 1;
+            linesCleared = 0;
+            dropInterval = 1000;
+            gameOver = false;
+            isPaused = false;
+            unlockedAchievements = [];
+            updateScore();
+            updateLevel();
+            updateAchievements();
+        }
+        
+        // Сброс текущего игрока
+        function resetPlayer() {
+            const pieces = 'IJLOSTZ';
+            
+            // Если следующая фигура уже есть, используем ее
+            if (nextPlayer.matrix) {
+                player.matrix = nextPlayer.matrix;
+            } else {
+                player.matrix = createPiece(pieces[pieces.length * Math.random() | 0]);
+            }
+            
+            // Создаем следующую фигуру
+            nextPlayer.matrix = createPiece(pieces[pieces.length * Math.random() | 0]);
+            
+            // Устанавливаем начальную позицию
+            player.pos.y = 0;
+            player.pos.x = (COLS / 2 | 0) - (player.matrix[0].length / 2 | 0);
+            
+            // Если при появлении фигуры есть коллизия - игра окончена
+            if (collide()) {
+                gameOver = true;
+                gameOverlay.classList.remove('hidden');
+                gameOverlay.querySelector('h2').textContent = 'Игра окончена!';
+                gameOverlay.querySelector('p').textContent = `Ваш счет: ${score}`;
+                startBtn.textContent = 'Играть снова';
+            }
+            
+            // Отрисовка следующей фигуры
+            drawNextPiece();
+        }
+        
+        // Создание фигуры по типу
+        function createPiece(type) {
+            switch (type) {
+                case 'I': return SHAPES[1];
+                case 'J': return SHAPES[2];
+                case 'L': return SHAPES[3];
+                case 'O': return SHAPES[4];
+                case 'S': return SHAPES[5];
+                case 'T': return SHAPES[6];
+                case 'Z': return SHAPES[7];
+            }
+        }
+        
+        // Отрисовка игрового поля
+        function draw() {
+            // Очистка canvas
+            ctx.fillStyle = '#0c2461';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Отрисовка игрового поля
+            drawMatrix(board, {x: 0, y: 0});
+            
+            // Отрисовка текущей фигуры
+            drawMatrix(player.matrix, player.pos);
+        }
+        
+        // Отрисовка матрицы (игрового поля или фигуры)
+        function drawMatrix(matrix, offset) {
+            matrix.forEach((row, y) => {
+                row.forEach((value, x) => {
+                    if (value !== 0) {
+                        ctx.fillStyle = COLORS[value];
+                        ctx.fillRect(
+                            (x + offset.x) * BLOCK_SIZE,
+                            (y + offset.y) * BLOCK_SIZE,
+                            BLOCK_SIZE, BLOCK_SIZE
+                        );
+                        
+                        // Добавляем градиент для красоты
+                        ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+                        ctx.lineWidth = 2;
+                        ctx.strokeRect(
+                            (x + offset.x) * BLOCK_SIZE,
+                            (y + offset.y) * BLOCK_SIZE,
+                            BLOCK_SIZE, BLOCK_SIZE
+                        );
+                    }
+                });
+            });
+        }
+        
+        // Отрисовка следующей фигуры
+        function drawNextPiece() {
+            nextCtx.fillStyle = 'rgba(12, 36, 97, 0.7)';
+            nextCtx.fillRect(0, 0, nextCanvas.width, nextCanvas.height);
+            
+            // Центрируем фигуру
+            const offset = {
+                x: (nextCanvas.width / BLOCK_SIZE / 2) - (nextPlayer.matrix[0].length / 2),
+                y: (nextCanvas.height / BLOCK_SIZE / 2) - (nextPlayer.matrix.length / 2)
+            };
+            
+            drawNextMatrix(nextPlayer.matrix, offset);
+        }
+        
+        // Отрисовка матрицы следующей фигуры
+        function drawNextMatrix(matrix, offset) {
+            matrix.forEach((row, y) => {
+                row.forEach((value, x) => {
+                    if (value !== 0) {
+                        nextCtx.fillStyle = COLORS[value];
+                        nextCtx.fillRect(
+                            (x + offset.x) * BLOCK_SIZE,
+                            (y + offset.y) * BLOCK_SIZE,
+                            BLOCK_SIZE, BLOCK_SIZE
+                        );
+                        
+                        nextCtx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+                        nextCtx.lineWidth = 1;
+                        nextCtx.strokeRect(
+                            (x + offset.x) * BLOCK_SIZE,
+                            (y + offset.y) * BLOCK_SIZE,
+                            BLOCK_SIZE, BLOCK_SIZE
+                        );
+                    }
+                });
+            });
+        }
+        
+        // Проверка коллизий
+        function collide() {
+            const [matrix, pos] = [player.matrix, player.pos];
+            for (let y = 0; y < matrix.length; ++y) {
+                for (let x = 0; x < matrix[y].length; ++x) {
+                    if (matrix[y][x] !== 0 &&
+                        (board[y + pos.y] &&
+                         board[y + pos.y][x + pos.x]) !== 0) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+        
+        // Объединение фигуры с игровым полем
+        function merge() {
+            player.matrix.forEach((row, y) => {
+                row.forEach((value, x) => {
+                    if (value !== 0) {
+                        board[y + player.pos.y][x + player.pos.x] = value;
+                    }
+                });
+            });
+        }
+        
+        // Движение фигуры вниз
+        function playerDrop() {
+            player.pos.y++;
+            if (collide()) {
+                player.pos.y--;
+                merge();
+                resetPlayer();
+                arenaSweep();
+                updateScore();
+            }
+            dropCounter = 0;
+        }
+        
+        // Движение фигуры влево
+        function playerMove(dir) {
+            player.pos.x += dir;
+            if (collide()) {
+                player.pos.x -= dir;
+            }
+        }
+        
+        // Вращение фигуры
+        function playerRotate() {
+            const pos = player.pos.x;
+            let offset = 1;
+            rotate(player.matrix);
+            
+            while (collide()) {
+                player.pos.x += offset;
+                offset = -(offset + (offset > 0 ? 1 : -1));
+                if (offset > player.matrix[0].length) {
+                    rotate(player.matrix);
+                    player.pos.x = pos;
+                    return;
+                }
+            }
+        }
+        
+        // Функция вращения матрицы
+        function rotate(matrix) {
+            for (let y = 0; y < matrix.length; ++y) {
+                for (let x = 0; x < y; ++x) {
+                    [
+                        matrix[x][y],
+                        matrix[y][x]
+                    ] = [
+                        matrix[y][x],
+                        matrix[x][y]
+                    ];
+                }
+            }
+            
+            matrix.forEach(row => row.reverse());
+        }
+        
+        // Очистка заполненных линий
+        function arenaSweep() {
+            let rowCount = 0;
+            let linesToClear = [];
+            
+            outer: for (let y = board.length - 1; y >= 0; --y) {
+                for (let x = 0; x < board[y].length; ++x) {
+                    if (board[y][x] === 0) {
+                        continue outer;
+                    }
+                }
+                
+                // Линия заполнена
+                const row = board.splice(y, 1)[0].fill(0);
+                board.unshift(row);
+                ++y;
+                
+                rowCount++;
+                linesToClear.push(y);
+            }
+            
+            if (rowCount > 0) {
+                // Анимация очистки линии
+                lineClearElement.classList.add('clear-animation');
+                setTimeout(() => {
+                    lineClearElement.classList.remove('clear-animation');
+                }, 500);
+                
+                // Эффект вспышки
+                canvas.classList.add('flash-effect');
+                setTimeout(() => {
+                    canvas.classList.remove('flash-effect');
+                }, 300);
+                
+                // Обновление счета
+                linesCleared += rowCount;
+                score += rowCount * 100 * level;
+                
+                // Обновление уровня каждые 10 линий
+                level = Math.floor(linesCleared / 10) + 1;
+                dropInterval = 1000 - (level - 1) * 50;
+                if (dropInterval < 100) dropInterval = 100;
+                
+                updateScore();
+                updateLevel();
+            }
+        }
+        
+        // Обновление счета
+        function updateScore() {
+            scoreElement.textContent = score;
+            checkAchievements();
+        }
+        
+        // Обновление уровня
+        function updateLevel() {
+            levelElement.textContent = level;
+        }
+        
+        // Проверка достижений
+        function checkAchievements() {
+            ACHIEVEMENTS.forEach(achievement => {
+                if (score >= achievement.score && !unlockedAchievements.includes(achievement.score)) {
+                    unlockedAchievements.push(achievement.score);
+                    showAchievement(achievement);
+                    updateAchievements();
+                }
+            });
+        }
+        
+        // Показать достижение
+        function showAchievement(achievement) {
+            memeTitle.textContent = achievement.title;
+            memeDescription.textContent = achievement.description;
+            memeImage.src = achievement.meme;
+            memeImage.alt = achievement.title;
+            
+            // Показываем оверлей с мемом
+            memeOverlay.classList.add('active');
+            
+            // Автоматически скрываем через 5 секунд
+            setTimeout(() => {
+                if (memeOverlay.classList.contains('active')) {
+                    memeOverlay.classList.remove('active');
+                }
+            }, 5000);
+        }
+        
+        // Обновление списка достижений
+        function updateAchievements() {
+            const achievementElements = achievementsContainer.querySelectorAll('.achievement');
+            
+            achievementElements.forEach(element => {
+                const scoreRequired = parseInt(element.getAttribute('data-score'));
+                
+                if (unlockedAchievements.includes(scoreRequired)) {
+                    element.classList.add('unlocked');
+                } else {
+                    element.classList.remove('unlocked');
+                }
+            });
+        }
+        
+        // Игровой цикл
+        function update(time = 0) {
+            if (isPaused || gameOver) {
+                lastTime = time;
+                animationFrameId = requestAnimationFrame(update);
+                return;
+            }
+            
+            const deltaTime = time - lastTime;
+            lastTime = time;
+            
+            dropCounter += deltaTime;
+            if (dropCounter > dropInterval) {
+                playerDrop();
+            }
+            
+            draw();
+            animationFrameId = requestAnimationFrame(update);
+        }
+        
+        // Обработка нажатий клавиш
+        document.addEventListener('keydown', event => {
+            if (gameOver) return;
+            
+            if (event.keyCode === 80) { // P - пауза
+                event.preventDefault();
+                togglePause();
+                return;
+            }
+            
+            if (isPaused) return;
+            
+            switch (event.keyCode) {
+                case 37: // Влево
+                    playerMove(-1);
+                    break;
+                case 39: // Вправо
+                    playerMove(1);
+                    break;
+                case 40: // Вниз
+                    playerDrop();
+                    break;
+                case 38: // Вверх
+                    playerRotate();
+                    break;
+                case 32: // Пробел - мгновенное падение
+                    event.preventDefault();
+                    while (!collide()) {
+                        player.pos.y++;
+                    }
+                    player.pos.y--;
+                    merge();
+                    resetPlayer();
+                    arenaSweep();
+                    updateScore();
+                    break;
+            }
+        });
+        
+        // Функция паузы
+        function togglePause() {
+            isPaused = !isPaused;
+            pauseBtn.textContent = isPaused ? 'Продолжить' : 'Пауза';
+            
+            if (isPaused) {
+                gameOverlay.classList.remove('hidden');
+                gameOverlay.querySelector('h2').textContent = 'ПАУЗА';
+                gameOverlay.querySelector('p').textContent = 'Игра приостановлена';
+                startBtn.textContent = 'Продолжить';
+            } else {
+                gameOverlay.classList.add('hidden');
+            }
+        }
+        
+        // Обработчики кнопок
+        startBtn.addEventListener('click', () => {
+            if (gameOver) {
+                resetGame();
+            }
+            gameOverlay.classList.add('hidden');
+            isPaused = false;
+            pauseBtn.textContent = 'Пауза';
+            
+            if (!animationFrameId) {
+                lastTime = performance.now();
+                update(lastTime);
+            }
+        });
+        
+        pauseBtn.addEventListener('click', togglePause);
+        
+        restartBtn.addEventListener('click', () => {
+            resetGame();
+            resetPlayer();
+            gameOverlay.classList.add('hidden');
+            isPaused = false;
+            pauseBtn.textContent = 'Пауза';
+            
+            if (!animationFrameId) {
+                lastTime = performance.now();
+                update(lastTime);
+            }
+        });
+        
+        // Запуск игры при загрузке страницы
+        window.addEventListener('load', () => {
+            init();
+        });
+    </script>
+</body>
+</html>

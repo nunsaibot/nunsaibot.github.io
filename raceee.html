@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Гонки-Ранер PRO</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(to bottom, #1a1a2e, #16213e);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+        
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 800px;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #ffcc00;
+            text-shadow: 0 0 10px rgba(255, 204, 0, 0.7);
+        }
+        
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-bottom: 15px;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px 20px;
+            border-radius: 10px;
+            border: 2px solid #ffcc00;
+        }
+        
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .info-label {
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+        
+        .info-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #ffcc00;
+        }
+        
+        .game-container {
+            position: relative;
+            width: 100%;
+            height: 500px;
+            background: #111;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+            border: 3px solid #ffcc00;
+        }
+        
+        #gameCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+            width: 100%;
+        }
+        
+        button {
+            padding: 12px 25px;
+            font-size: 1.1rem;
+            background: linear-gradient(to bottom, #ffcc00, #ff9900);
+            border: none;
+            border-radius: 50px;
+            color: #000;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(255, 204, 0, 0.4);
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 204, 0, 0.6);
+        }
+        
+        button:active {
+            transform: translateY(1px);
+        }
+        
+        .upgrades {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .upgrade-btn {
+            padding: 8px 15px;
+            font-size: 0.9rem;
+            background: linear-gradient(to bottom, #3498db, #2980b9);
+        }
+        
+        .upgrade-btn:disabled {
+            background: #7f8c8d;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .powerup-indicator {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px;
+            border-radius: 10px;
+            border: 2px solid #ffcc00;
+            z-index: 5;
+        }
+        
+        .instructions {
+            margin-top: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 15px;
+            border-radius: 10px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        .instructions h3 {
+            color: #ffcc00;
+            margin-bottom: 10px;
+        }
+        
+        .instructions p {
+            margin-bottom: 5px;
+            color: #ccc;
+        }
+        
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 10;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .screen h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: #ffcc00;
+        }
+        
+        .screen p {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            max-width: 80%;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        @media (max-width: 600px) {
+            .game-container {
+                height: 400px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .controls {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .upgrades {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>ГОНКИ-РАНЕР PRO</h1>
+        </header>
+        
+        <div class="game-info">
+            <div class="info-item">
+                <div class="info-label">СЧЁТ</div>
+                <div class="info-value" id="score">0</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">СКОРОСТЬ</div>
+                <div class="info-value" id="speed">0</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">МОНЕТКИ</div>
+                <div class="info-value" id="coins">0</div>
+            </div>
+        </div>
+        
+        <div class="game-container">
+            <div id="startScreen" class="screen">
+                <h2>ГОНКИ-РАНЕР PRO</h2>
+                <p>Управляйте машиной, уворачивайтесь от препятствий и собирайте монетки!</p>
+                <p>Используйте клавиши ← и → для движения, пробел для ускорения</p>
+                <p>Соберите 20 монет для активации улучшений!</p>
+                <button id="startButton">НАЧАТЬ ИГРУ</button>
+            </div>
+            
+            <div id="gameOverScreen" class="screen hidden">
+                <h2>ИГРА ОКОНЧЕНА</h2>
+                <p>Ваш счёт: <span id="finalScore">0</span></p>
+                <p>Собрано монет: <span id="finalCoins">0</span></p>
+                <button id="restartButton">ИГРАТЬ СНОВА</button>
+            </div>
+            
+            <div id="powerupIndicator" class="powerup-indicator hidden">
+                <div id="powerupText"></div>
+                <div id="powerupTimer"></div>
+            </div>
+            
+            <canvas id="gameCanvas"></canvas>
+        </div>
+        
+        <div class="upgrades">
+            <button id="invisibilityBtn" class="upgrade-btn" disabled>Невидимость (20 монет)</button>
+            <button id="superSpeedBtn" class="upgrade-btn" disabled>Супер скорость (20 монет)</button>
+            <button id="turboBtn" class="upgrade-btn" disabled>Турбо (20 монет)</button>
+        </div>
+        
+        <div class="controls">
+            <button id="leftButton">← ВЛЕВО</button>
+            <button id="rightButton">ВПРАВО →</button>
+        </div>
+        
+        <div class="instructions">
+            <h3>Управление</h3>
+            <p>← → - Движение влево/вправо</p>
+            <p>Пробел - Ускорение</p>
+            <p>Соберите 20 монет для активации улучшений!</p>
+        </div>
+    </div>
+
+    <script>
+        // Получаем элементы DOM
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const startScreen = document.getElementById('startScreen');
+        const gameOverScreen = document.getElementById('gameOverScreen');
+        const startButton = document.getElementById('startButton');
+        const restartButton = document.getElementById('restartButton');
+        const leftButton = document.getElementById('leftButton');
+        const rightButton = document.getElementById('rightButton');
+        const invisibilityBtn = document.getElementById('invisibilityBtn');
+        const superSpeedBtn = document.getElementById('superSpeedBtn');
+        const turboBtn = document.getElementById('turboBtn');
+        const scoreElement = document.getElementById('score');
+        const speedElement = document.getElementById('speed');
+        const coinsElement = document.getElementById('coins');
+        const finalScoreElement = document.getElementById('finalScore');
+        const finalCoinsElement = document.getElementById('finalCoins');
+        const powerupIndicator = document.getElementById('powerupIndicator');
+        const powerupText = document.getElementById('powerupText');
+        const powerupTimer = document.getElementById('powerupTimer');
+
+        // Устанавливаем размеры canvas
+        canvas.width = canvas.offsetWidth;
+        canvas.height = canvas.offsetHeight;
+
+        // Игровые переменные
+        let gameActive = false;
+        let score = 0;
+        let coins = 0;
+        let speed = 0;
+        let gameSpeed = 3;
+        let playerX = canvas.width / 2;
+        const playerWidth = 60;
+        const playerHeight = 100;
+        
+        // Система улучшений
+        let activePowerup = null;
+        let powerupTimeLeft = 0;
+        let isInvincible = false;
+        let moveSpeedMultiplier = 1;
+        
+        // Плавное управление
+        let keys = {
+            left: false,
+            right: false
+        };
+        
+        let playerVelocity = 0;
+        const acceleration = 0.4;
+        const friction = 0.3;
+        const maxSpeed = 12;
+        
+        // Массивы для объектов
+        let obstacles = [];
+        let coinsArray = [];
+        let roadLines = [];
+        let particles = [];
+        
+        // Класс игрока
+        class Player {
+            constructor(x, y, width, height) {
+                this.x = x;
+                this.y = y;
+                this.width = width;
+                this.height = height;
+                this.baseSpeed = 8;
+            }
+            
+            draw() {
+                ctx.save();
+                
+                // Эффект невидимости
+                if (isInvincible) {
+                    ctx.globalAlpha = 0.5 + Math.sin(Date.now() * 0.01) * 0.3;
+                }
+                
+                // Основной кузов
+                ctx.fillStyle = '#3498db';
+                ctx.fillRect(this.x, this.y, this.width, this.height);
+                
+                // Верхняя часть машины
+                ctx.fillStyle = '#2980b9';
+                ctx.fillRect(this.x + 5, this.y, this.width - 10, this.height * 0.4);
+                
+                // Лобовое стекло
+                ctx.fillStyle = '#aed6f1';
+                ctx.fillRect(this.x + 8, this.y + 5, this.width - 16, 15);
+                
+                // Боковые стекла
+                ctx.fillRect(this.x + 8, this.y + 25, this.width - 16, 20);
+                
+                // Фары
+                ctx.fillStyle = '#f1c40f';
+                ctx.fillRect(this.x, this.y, 8, 5);
+                ctx.fillRect(this.x + this.width - 8, this.y, 8, 5);
+                
+                // Задние фонари
+                ctx.fillStyle = '#e74c3c';
+                ctx.fillRect(this.x, this.y + this.height - 5, 8, 5);
+                ctx.fillRect(this.x + this.width - 8, this.y + this.height - 5, 8, 5);
+                
+                // Детали
+                ctx.strokeStyle = '#2c3e50';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(this.x + 2, this.y + 2, this.width - 4, this.height - 4);
+                
+                // Колёса
+                ctx.fillStyle = '#2c3e50';
+                ctx.fillRect(this.x - 5, this.y + 15, 6, 25);
+                ctx.fillRect(this.x - 5, this.y + 60, 6, 25);
+                ctx.fillRect(this.x + this.width - 1, this.y + 15, 6, 25);
+                ctx.fillRect(this.x + this.width - 1, this.y + 60, 6, 25);
+                
+                // Диски колёс
+                ctx.fillStyle = '#7f8c8d';
+                ctx.fillRect(this.x - 3, this.y + 25, 4, 10);
+                ctx.fillRect(this.x - 3, this.y + 70, 4, 10);
+                ctx.fillRect(this.x + this.width + 1, this.y + 25, 4, 10);
+                ctx.fillRect(this.x + this.width + 1, this.y + 70, 4, 10);
+                
+                // Эффект скорости
+                if (activePowerup === 'superSpeed' || activePowerup === 'turbo') {
+                    this.drawSpeedEffect();
+                }
+                
+                ctx.restore();
+            }
+            
+            drawSpeedEffect() {
+                ctx.fillStyle = '#ff9900';
+                ctx.globalAlpha = 0.6;
+                for (let i = 0; i < 3; i++) {
+                    ctx.fillRect(
+                        this.x - 15 - i * 10, 
+                        this.y + 20 + i * 15, 
+                        10, 
+                        15
+                    );
+                }
+                ctx.globalAlpha = 1;
+            }
+            
+            update() {
+                // Применяем физику движения
+                if (keys.left) {
+                    playerVelocity -= acceleration * moveSpeedMultiplier;
+                }
+                if (keys.right) {
+                    playerVelocity += acceleration * moveSpeedMultiplier;
+                }
+                
+                // Применяем трение
+                playerVelocity *= (1 - friction);
+                
+                // Ограничиваем максимальную скорость
+                if (Math.abs(playerVelocity) > maxSpeed * moveSpeedMultiplier) {
+                    playerVelocity = Math.sign(playerVelocity) * maxSpeed * moveSpeedMultiplier;
+                }
+                
+                // Обновляем позицию
+                this.x += playerVelocity;
+                
+                // Ограничиваем движение в пределах дороги
+                if (this.x < 50) {
+                    this.x = 50;
+                    playerVelocity = 0;
+                }
+                if (this.x > canvas.width - this.width - 50) {
+                    this.x = canvas.width - this.width - 50;
+                    playerVelocity = 0;
+                }
+            }
+        }
+        
+        // Класс препятствий
+        class Obstacle {
+            constructor(x, y, width, height, type) {
+                this.x = x;
+                this.y = y;
+                this.width = width;
+                this.height = height;
+                this.speed = gameSpeed;
+                this.type = type || Math.floor(Math.random() * 3); // 0-2 разные типы машин
+            }
+            
+            update() {
+                this.y += this.speed;
+            }
+            
+            draw() {
+                const colors = ['#e74c3c', '#e67e22', '#c0392b'];
+                const darkColors = ['#c0392b', '#d35400', '#a93226'];
+                
+                ctx.fillStyle = colors[this.type];
+                ctx.fillRect(this.x, this.y, this.width, this.height);
+                
+                // Верхняя часть
+                ctx.fillStyle = darkColors[this.type];
+                ctx.fillRect(this.x + 5, this.y, this.width - 10, this.height * 0.4);
+                
+                // Стекло
+                ctx.fillStyle = '#aed6f1';
+                ctx.fillRect(this.x + 8, this.y + 5, this.width - 16, 10);
+                
+                // Фары
+                ctx.fillStyle = '#f1c40f';
+                ctx.fillRect(this.x, this.y, 6, 4);
+                ctx.fillRect(this.x + this.width - 6, this.y, 6, 4);
+                
+                // Колёса
+                ctx.fillStyle = '#2c3e50';
+                ctx.fillRect(this.x - 4, this.y + 10, 5, 20);
+                ctx.fillRect(this.x - 4, this.y + this.height - 30, 5, 20);
+                ctx.fillRect(this.x + this.width - 1, this.y + 10, 5, 20);
+                ctx.fillRect(this.x + this.width - 1, this.y + this.height - 30, 5, 20);
+            }
+            
+            isOffScreen() {
+                return this.y > canvas.height;
+            }
+            
+            collidesWith(player) {
+                if (isInvincible) return false;
+                
+                return (
+                    this.x < player.x + player.width &&
+                    this.x + this.width > player.x &&
+                    this.y < player.y + player.height &&
+                    this.y + this.height > player.y
+                );
+            }
+        }
+        
+        // Класс монеток
+        class Coin {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.radius = 12;
+                this.speed = gameSpeed;
+                this.collected = false;
+                this.rotation = 0;
+            }
+            
+            update() {
+                this.y += this.speed;
+                this.rotation += 0.1;
+            }
+            
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.rotation);
+                
+                // Основная часть монеты
+                ctx.fillStyle = '#ffcc00';
+                ctx.beginPath();
+                ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Внутренний круг
+                ctx.fillStyle = '#ff9900';
+                ctx.beginPath();
+                ctx.arc(0, 0, this.radius * 0.7, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Блеск
+                ctx.fillStyle = '#fff';
+                ctx.beginPath();
+                ctx.arc(-this.radius * 0.3, -this.radius * 0.3, this.radius * 0.3, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Контур
+                ctx.strokeStyle = '#cc9900';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
+                ctx.stroke();
+                
+                ctx.restore();
+            }
+            
+            isOffScreen() {
+                return this.y > canvas.height;
+            }
+            
+            collidesWith(player) {
+                if (this.collected) return false;
+                
+                const dx = this.x - (player.x + player.width / 2);
+                const dy = this.y - (player.y + player.height / 2);
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                return distance < this.radius + Math.min(player.width, player.height) / 2;
+            }
+        }
+        
+        // Класс линий разметки
+        class RoadLine {
+            constructor(y) {
+                this.x = canvas.width / 2;
+                this.y = y;
+                this.width = 12;
+                this.height = 40;
+                this.speed = gameSpeed;
+            }
+            
+            update() {
+                this.y += this.speed;
+            }
+            
+            draw() {
+                ctx.fillStyle = '#fff';
+                ctx.fillRect(this.x - this.width / 2, this.y, this.width, this.height);
+                
+                // Отражение
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+                ctx.fillRect(this.x - this.width / 2 + 2, this.y + 2, this.width - 4, 5);
+            }
+            
+            isOffScreen() {
+                return this.y > canvas.height;
+            }
+        }
+        
+        // Класс частиц для эффектов
+        class Particle {
+            constructor(x, y, color) {
+                this.x = x;
+                this.y = y;
+                this.color = color;
+                this.size = Math.random() * 5 + 2;
+                this.speedX = Math.random() * 6 - 3;
+                this.speedY = Math.random() * 6 - 3;
+                this.life = 1;
+            }
+            
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.life -= 0.02;
+                this.size *= 0.95;
+            }
+            
+            draw() {
+                ctx.globalAlpha = this.life;
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.globalAlpha = 1;
+            }
+        }
+        
+        // Создаем игрока
+        const player = new Player(playerX, canvas.height - 120, playerWidth, playerHeight);
+        
+        // Функция инициализации игры
+        function initGame() {
+            gameActive = true;
+            score = 0;
+            coins = 0;
+            speed = 0;
+            gameSpeed = 3;
+            obstacles = [];
+            coinsArray = [];
+            roadLines = [];
+            particles = [];
+            activePowerup = null;
+            powerupTimeLeft = 0;
+            isInvincible = false;
+            moveSpeedMultiplier = 1;
+            playerVelocity = 0;
+            
+            // Сбрасываем кнопки улучшений
+            updateUpgradeButtons();
+            powerupIndicator.classList.add('hidden');
+            
+            // Создаем начальные линии разметки
+            for (let i = 0; i < 10; i++) {
+                roadLines.push(new RoadLine(i * 70));
+            }
+            
+            updateGameInfo();
+        }
+        
+        // Функция обновления информации на экране
+        function updateGameInfo() {
+            scoreElement.textContent = score;
+            speedElement.textContent = Math.round(speed);
+            coinsElement.textContent = coins;
+        }
+        
+        // Функция обновления кнопок улучшений
+        function updateUpgradeButtons() {
+            const canAfford = coins >= 20;
+            invisibilityBtn.disabled = !canAfford;
+            superSpeedBtn.disabled = !canAfford;
+            turboBtn.disabled = !canAfford;
+        }
+        
+        // Функция создания препятствий
+        function createObstacle() {
+            const width = 50 + Math.random() * 30;
+            const height = 40 + Math.random() * 20;
+            const x = 50 + Math.random() * (canvas.width - width - 100);
+            obstacles.push(new Obstacle(x, -height, width, height));
+        }
+        
+        // Функция создания монеток
+        function createCoin() {
+            const x = 70 + Math.random() * (canvas.width - 140);
+            coinsArray.push(new Coin(x, -30));
+        }
+        
+        // Функция активации улучшения
+        function activatePowerup(type) {
+            if (coins < 20) return;
+            
+            coins -= 20;
+            activePowerup = type;
+            powerupTimeLeft = 5; // 5 секунд
+            
+            switch(type) {
+                case 'invisibility':
+                    isInvincible = true;
+                    powerupText.textContent = 'НЕВИДИМОСТЬ';
+                    powerupText.style.color = '#9b59b6';
+                    break;
+                case 'superSpeed':
+                    gameSpeed += 5;
+                    powerupText.textContent = 'СУПЕР СКОРОСТЬ';
+                    powerupText.style.color = '#e74c3c';
+                    break;
+                case 'turbo':
+                    moveSpeedMultiplier = 2;
+                    powerupText.textContent = 'ТУРБО';
+                    powerupText.style.color = '#f1c40f';
+                    break;
+            }
+            
+            powerupIndicator.classList.remove('hidden');
+            updateUpgradeButtons();
+            createParticleEffect(player.x + player.width/2, player.y, 20, powerupText.style.color);
+        }
+        
+        // Функция создания эффекта частиц
+        function createParticleEffect(x, y, count, color) {
+            for (let i = 0; i < count; i++) {
+                particles.push(new Particle(x, y, color));
+            }
+        }
+        
+        // Функция обновления улучшений
+        function updatePowerups() {
+            if (activePowerup && powerupTimeLeft > 0) {
+                powerupTimeLeft -= 1/60; // Уменьшаем время
+                powerupTimer.textContent = Math.ceil(powerupTimeLeft) + 'с';
+                
+                if (powerupTimeLeft <= 0) {
+                    deactivatePowerup();
+                }
+            }
+        }
+        
+        // Функция деактивации улучшения
+        function deactivatePowerup() {
+            switch(activePowerup) {
+                case 'invisibility':
+                    isInvincible = false;
+                    break;
+                case 'superSpeed':
+                    gameSpeed -= 5;
+                    break;
+                case 'turbo':
+                    moveSpeedMultiplier = 1;
+                    break;
+            }
+            
+            activePowerup = null;
+            powerupIndicator.classList.add('hidden');
+            createParticleEffect(player.x + player.width/2, player.y, 15, '#fff');
+        }
+        
+        // Функция обновления игры
+        function updateGame() {
+            if (!gameActive) return;
+            
+            // Обновляем игрока
+            player.update();
+            
+            // Увеличиваем скорость и счет
+            speed += 0.01;
+            score += Math.round(speed);
+            gameSpeed = 3 + speed / 10;
+            
+            // Обновляем улучшения
+            updatePowerups();
+            
+            // Обновляем линии разметки
+            for (let i = 0; i < roadLines.length; i++) {
+                roadLines[i].speed = gameSpeed;
+                roadLines[i].update();
+                
+                if (roadLines[i].isOffScreen()) {
+                    roadLines.splice(i, 1);
+                    roadLines.push(new RoadLine(-40));
+                    i--;
+                }
+            }
+            
+            // Обновляем препятствия
+            for (let i = 0; i < obstacles.length; i++) {
+                obstacles[i].speed = gameSpeed;
+                obstacles[i].update();
+                
+                if (obstacles[i].isOffScreen()) {
+                    obstacles.splice(i, 1);
+                    i--;
+                } else if (obstacles[i].collidesWith(player)) {
+                    createParticleEffect(player.x + player.width/2, player.y + player.height/2, 30, '#e74c3c');
+                    gameOver();
+                    return;
+                }
+            }
+            
+            // Обновляем монетки
+            for (let i = 0; i < coinsArray.length; i++) {
+                coinsArray[i].speed = gameSpeed;
+                coinsArray[i].update();
+                
+                if (coinsArray[i].isOffScreen()) {
+                    coinsArray.splice(i, 1);
+                    i--;
+                } else if (coinsArray[i].collidesWith(player)) {
+                    coins++;
+                    coinsArray[i].collected = true;
+                    createParticleEffect(coinsArray[i].x, coinsArray[i].y, 10, '#ffcc00');
+                    coinsArray.splice(i, 1);
+                    i--;
+                    updateUpgradeButtons();
+                }
+            }
+            
+            // Обновляем частицы
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                if (particles[i].life <= 0) {
+                    particles.splice(i, 1);
+                    i--;
+                }
+            }
+            
+            // Создаем новые препятствия и монетки
+            if (Math.random() < 0.02) {
+                createObstacle();
+            }
+            
+            if (Math.random() < 0.01) {
+                createCoin();
+            }
+            
+            updateGameInfo();
+        }
+        
+        // Функция отрисовки игры
+        function drawGame() {
+            // Очищаем canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Рисуем дорогу с градиентом
+            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            gradient.addColorStop(0, '#2c3e50');
+            gradient.addColorStop(1, '#34495e');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Рисуем обочины
+            ctx.fillStyle = '#7f8c8d';
+            ctx.fillRect(0, 0, 50, canvas.height);
+            ctx.fillRect(canvas.width - 50, 0, 50, canvas.height);
+            
+            // Рисуем линии разметки
+            for (const line of roadLines) {
+                line.draw();
+            }
+            
+            // Рисуем частицы
+            for (const particle of particles) {
+                particle.draw();
+            }
+            
+            // Рисуем монетки
+            for (const coin of coinsArray) {
+                coin.draw();
+            }
+            
+            // Рисуем препятствия
+            for (const obstacle of obstacles) {
+                obstacle.draw();
+            }
+            
+            // Рисуем игрока
+            player.draw();
+        }
+        
+        // Функция завершения игры
+        function gameOver() {
+            gameActive = false;
+            finalScoreElement.textContent = score;
+            finalCoinsElement.textContent = coins;
+            gameOverScreen.classList.remove('hidden');
+        }
+        
+        // Игровой цикл
+        function gameLoop() {
+            updateGame();
+            drawGame();
+            requestAnimationFrame(gameLoop);
+        }
+        
+        // Обработчики событий
+        startButton.addEventListener('click', () => {
+            startScreen.classList.add('hidden');
+            initGame();
+        });
+        
+        restartButton.addEventListener('click', () => {
+            gameOverScreen.classList.add('hidden');
+            initGame();
+        });
+        
+        // Кнопки улучшений
+        invisibilityBtn.addEventListener('click', () => activatePowerup('invisibility'));
+        superSpeedBtn.addEventListener('click', () => activatePowerup('superSpeed'));
+        turboBtn.addEventListener('click', () => activatePowerup('turbo'));
+        
+        // Управление с клавиатуры
+        document.addEventListener('keydown', (e) => {
+            if (!gameActive) return;
+            
+            if (e.key === 'ArrowLeft') {
+                keys.left = true;
+            } else if (e.key === 'ArrowRight') {
+                keys.right = true;
+            } else if (e.key === ' ') {
+                // Временное ускорение
+                gameSpeed += 3;
+                setTimeout(() => {
+                    if (gameActive) gameSpeed -= 3;
+                }, 500);
+            }
+        });
+        
+        document.addEventListener('keyup', (e) => {
+            if (e.key === 'ArrowLeft') {
+                keys.left = false;
+            } else if (e.key === 'ArrowRight') {
+                keys.right = false;
+            }
+        });
+        
+        // Управление с кнопок
+        leftButton.addEventListener('mousedown', () => keys.left = true);
+        leftButton.addEventListener('mouseup', () => keys.left = false);
+        leftButton.addEventListener('touchstart', () => keys.left = true);
+        leftButton.addEventListener('touchend', () => keys.left = false);
+        
+        rightButton.addEventListener('mousedown', () => keys.right = true);
+        rightButton.addEventListener('mouseup', () => keys.right = false);
+        rightButton.addEventListener('touchstart', () => keys.right = true);
+        rightButton.addEventListener('touchend', () => keys.right = false);
+        
+        // Адаптация размера canvas при изменении размера окна
+        window.addEventListener('resize', () => {
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+        });
+        
+        // Запускаем игровой цикл
+        gameLoop();
+    </script>
+</body>
+</html>

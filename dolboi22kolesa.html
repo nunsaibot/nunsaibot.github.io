@@ -1,0 +1,1225 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Дальнобойщик: Старт с нуля</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(to bottom, #2c3e50, #34495e);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 900px;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #f39c12;
+            text-shadow: 0 0 10px rgba(243, 156, 18, 0.7);
+        }
+        
+        .subtitle {
+            color: #bdc3c7;
+            font-size: 1.1rem;
+        }
+        
+        .game-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid #f39c12;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #f39c12;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #bdc3c7;
+        }
+        
+        .game-container {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            background: #1a1a1a;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+            border: 3px solid #f39c12;
+            margin-bottom: 20px;
+        }
+        
+        #gameCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .cargo-selection {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        
+        .cargo-card {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #3498db;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .cargo-card:hover {
+            transform: translateY(-5px);
+            border-color: #f39c12;
+            box-shadow: 0 5px 15px rgba(243, 156, 18, 0.4);
+        }
+        
+        .cargo-card.selected {
+            border-color: #f39c12;
+            background: rgba(243, 156, 18, 0.1);
+        }
+        
+        .cargo-card.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            border-color: #7f8c8d;
+        }
+        
+        .cargo-card.disabled:hover {
+            transform: none;
+            box-shadow: none;
+            border-color: #7f8c8d;
+        }
+        
+        .cargo-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        .cargo-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #f39c12;
+        }
+        
+        .cargo-price {
+            font-size: 1rem;
+            color: #bdc3c7;
+        }
+        
+        .cargo-profit {
+            font-size: 1rem;
+            color: #2ecc71;
+            margin-top: 5px;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        
+        button {
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            background: linear-gradient(to bottom, #f39c12, #e67e22);
+            border: none;
+            border-radius: 50px;
+            color: #000;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(243, 156, 18, 0.4);
+        }
+        
+        button:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(243, 156, 18, 0.6);
+        }
+        
+        button:active {
+            transform: translateY(1px);
+        }
+        
+        button:disabled {
+            background: #7f8c8d;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 10;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .screen h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: #f39c12;
+        }
+        
+        .screen p {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            max-width: 80%;
+            line-height: 1.5;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .progress-bar {
+            width: 80%;
+            height: 20px;
+            background: #34495e;
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(to right, #2ecc71, #f39c12);
+            border-radius: 10px;
+            transition: width 0.3s;
+            width: 0%;
+        }
+        
+        .trip-info {
+            display: flex;
+            justify-content: space-between;
+            width: 80%;
+            margin-top: 10px;
+            font-size: 1rem;
+            color: #bdc3c7;
+        }
+        
+        .event-log {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #f39c12;
+            max-width: 300px;
+            font-size: 0.9rem;
+        }
+        
+        .event-item {
+            margin-bottom: 5px;
+            padding: 5px;
+            border-left: 3px solid #f39c12;
+            background: rgba(243, 156, 18, 0.1);
+        }
+        
+        .game-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            padding: 20px;
+        }
+        
+        /* Музыкальный плеер */
+        .music-player {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            border: 1px solid #f39c12;
+        }
+        
+        .player-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .music-input {
+            flex: 1;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #f39c12;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        
+        .music-input::placeholder {
+            color: #bdc3c7;
+        }
+        
+        .player-btn {
+            padding: 8px 15px;
+            background: #f39c12;
+            border: none;
+            border-radius: 5px;
+            color: #000;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .weather-indicator {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 8px 15px;
+            border-radius: 5px;
+            border: 1px solid #f39c12;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        @media (max-width: 768px) {
+            .game-stats, .cargo-selection {
+                grid-template-columns: 1fr;
+            }
+            
+            .controls {
+                flex-direction: column;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .music-player {
+                padding: 10px;
+            }
+            
+            .player-controls {
+                flex-direction: column;
+            }
+            
+            .weather-indicator {
+                top: 5px;
+                right: 5px;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>ДАЛЬНОБОЙЩИК: СТАРТ С НУЛЯ</h1>
+            <div class="subtitle">Зарабатывай деньги, доставляя грузы по всей стране!</div>
+        </header>
+        
+        <div class="game-stats">
+            <div class="stat-card">
+                <div class="stat-value" id="money">$100</div>
+                <div class="stat-label">КАПИТАЛ</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="distance">0 км</div>
+                <div class="stat-label">ПРОЙДЕНО</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="deliveries">0</div>
+                <div class="stat-label">ДОСТАВОК</div>
+            </div>
+        </div>
+        
+        <div class="game-container">
+            <div id="weatherIndicator" class="weather-indicator hidden">
+                <span id="weatherIcon">☀️</span>
+                <span id="weatherText">Погода: Солнечно</span>
+            </div>
+            
+            <div id="startScreen" class="screen">
+                <h2>ДОБРО ПОЖАЛОВАТЬ!</h2>
+                <p>Вы - начинающий дальнобойщик. Ваша задача - доставлять грузы и зарабатывать деньги.</p>
+                <p>Первый груз - бесплатно! Выбирайте товар и отправляйтесь в путь.</p>
+                <button id="startButton">НАЧАТЬ КАРЬЕРУ</button>
+            </div>
+            
+            <div id="cargoScreen" class="screen hidden">
+                <h2>ВЫБЕРИТЕ ГРУЗ</h2>
+                <p>Выберите товар для доставки. Первая доставка - бесплатно!</p>
+                <div class="cargo-selection">
+                    <div class="cargo-card" data-type="grain">
+                        <div class="cargo-icon">🌾</div>
+                        <div class="cargo-name">ЗЕРНО</div>
+                        <div class="cargo-price">Цена: <span id="grainPrice">$50</span></div>
+                        <div class="cargo-profit">Прибыль: <span id="grainProfit">$100</span></div>
+                    </div>
+                    <div class="cargo-card" data-type="fertilizer">
+                        <div class="cargo-icon">🧪</div>
+                        <div class="cargo-name">УДОБРЕНИЯ</div>
+                        <div class="cargo-price">Цена: <span id="fertilizerPrice">$80</span></div>
+                        <div class="cargo-profit">Прибыль: <span id="fertilizerProfit">$150</span></div>
+                    </div>
+                    <div class="cargo-card" data-type="lego">
+                        <div class="cargo-icon">🧱</div>
+                        <div class="cargo-name">КОНСТРУКТОР</div>
+                        <div class="cargo-price">Цена: <span id="legoPrice">$120</span></div>
+                        <div class="cargo-profit">Прибыль: <span id="legoProfit">$200</span></div>
+                    </div>
+                </div>
+                <button id="deliverButton" disabled>НАЧАТЬ ДОСТАВКУ</button>
+            </div>
+            
+            <div id="gameScreen" class="screen hidden">
+                <div class="game-content">
+                    <h2>В ПУТИ...</h2>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <div class="trip-info">
+                        <span>Осталось: <span id="remainingDistance">1000</span> км</span>
+                        <span>Текущий груз: <span id="currentCargo">-</span></span>
+                    </div>
+                    <canvas id="gameCanvas"></canvas>
+                </div>
+            </div>
+            
+            <div id="resultScreen" class="screen hidden">
+                <h2>ДОСТАВКА ВЫПОЛНЕНА!</h2>
+                <p>Вы успешно доставили груз <span id="deliveredCargo">-</span></p>
+                <p>Заработано: <span id="earnedMoney" style="color: #2ecc71">$0</span></p>
+                <p>Общий капитал: <span id="totalMoney" style="color: #f39c12">$0</span></p>
+                <button id="nextDeliveryButton">СЛЕДУЮЩАЯ ДОСТАВКА</button>
+            </div>
+            
+            <div id="eventLog" class="event-log hidden">
+                <h3>СОБЫТИЯ:</h3>
+                <div id="eventList"></div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button id="buyCargoButton" disabled>КУПИТЬ ГРУЗ</button>
+            <button id="upgradeTruckButton" disabled>УЛУЧШИТЬ ГРУЗОВИК ($500)</button>
+        </div>
+        
+        <!-- Музыкальный плеер -->
+        <div class="music-player">
+            <div class="player-controls">
+                <input type="text" id="musicUrl" class="music-input" placeholder="Вставьте ссылку на музыку (MP3)">
+                <button id="playMusicBtn" class="player-btn">▶️ Включить</button>
+                <button id="pauseMusicBtn" class="player-btn">⏸️ Пауза</button>
+                <button id="stopMusicBtn" class="player-btn">⏹️ Стоп</button>
+            </div>
+            <div id="musicStatus" style="color: #f39c12; text-align: center; font-size: 0.9rem;">
+                Музыка выключена. Вставьте ссылку на MP3 файл.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Получаем элементы DOM
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const startScreen = document.getElementById('startScreen');
+        const cargoScreen = document.getElementById('cargoScreen');
+        const gameScreen = document.getElementById('gameScreen');
+        const resultScreen = document.getElementById('resultScreen');
+        const startButton = document.getElementById('startButton');
+        const deliverButton = document.getElementById('deliverButton');
+        const nextDeliveryButton = document.getElementById('nextDeliveryButton');
+        const buyCargoButton = document.getElementById('buyCargoButton');
+        const upgradeTruckButton = document.getElementById('upgradeTruckButton');
+        const weatherIndicator = document.getElementById('weatherIndicator');
+        const weatherIcon = document.getElementById('weatherIcon');
+        const weatherText = document.getElementById('weatherText');
+        
+        // Музыкальный плеер
+        const musicUrlInput = document.getElementById('musicUrl');
+        const playMusicBtn = document.getElementById('playMusicBtn');
+        const pauseMusicBtn = document.getElementById('pauseMusicBtn');
+        const stopMusicBtn = document.getElementById('stopMusicBtn');
+        const musicStatus = document.getElementById('musicStatus');
+        
+        // Элементы статистики
+        const moneyElement = document.getElementById('money');
+        const distanceElement = document.getElementById('distance');
+        const deliveriesElement = document.getElementById('deliveries');
+        
+        // Элементы прогресса
+        const progressFill = document.getElementById('progressFill');
+        const remainingDistanceElement = document.getElementById('remainingDistance');
+        const currentCargoElement = document.getElementById('currentCargo');
+        const deliveredCargoElement = document.getElementById('deliveredCargo');
+        const earnedMoneyElement = document.getElementById('earnedMoney');
+        const totalMoneyElement = document.getElementById('totalMoney');
+        
+        // Цены и прибыль
+        const grainPriceElement = document.getElementById('grainPrice');
+        const grainProfitElement = document.getElementById('grainProfit');
+        const fertilizerPriceElement = document.getElementById('fertilizerPrice');
+        const fertilizerProfitElement = document.getElementById('fertilizerProfit');
+        const legoPriceElement = document.getElementById('legoPrice');
+        const legoProfitElement = document.getElementById('legoProfit');
+        
+        // Система событий
+        const eventLog = document.getElementById('eventLog');
+        const eventList = document.getElementById('eventList');
+
+        // Игровые переменные
+        let gameState = {
+            money: 100,
+            totalDistance: 0,
+            deliveries: 0,
+            currentCargo: null,
+            currentTripDistance: 0,
+            totalTripDistance: 1000,
+            truckSpeed: 50, // км/ч в игровом времени
+            truckLevel: 1,
+            isFirstDelivery: true,
+            weatherType: 0, // 0 - солнечно, 1 - дождь, 2 - снег, 3 - ночь
+            biomeType: 0, // 0 - лес, 1 - пустыня, 2 - горы, 3 - равнина
+            lastBiomeChangeAt: 0 // Добавляем переменную для отслеживания последней смены
+        };
+
+        // Музыка
+        let audioPlayer = null;
+        let currentMusicUrl = '';
+
+        // Экономика игры
+        const cargoTypes = {
+            grain: {
+                name: "Зерно",
+                icon: "🌾",
+                basePrice: 50,
+                baseProfit: 100,
+                priceMultiplier: 1.3,
+                profitMultiplier: 1.25
+            },
+            fertilizer: {
+                name: "Удобрения",
+                icon: "🧪",
+                basePrice: 80,
+                baseProfit: 150,
+                priceMultiplier: 1.4,
+                profitMultiplier: 1.35
+            },
+            lego: {
+                name: "Конструктор",
+                icon: "🧱",
+                basePrice: 120,
+                baseProfit: 200,
+                priceMultiplier: 1.5,
+                profitMultiplier: 1.45
+            }
+        };
+
+        // Текущие цены
+        let currentPrices = {};
+        let currentProfits = {};
+
+        // Анимационные переменные
+        let truckX = 100;
+        let backgroundOffset = 0;
+        let lastUpdateTime = 0;
+        let animationId = null;
+
+        // Инициализация цен
+        function initializePrices() {
+            for (const type in cargoTypes) {
+                const cargo = cargoTypes[type];
+                currentPrices[type] = cargo.basePrice;
+                currentProfits[type] = cargo.baseProfit;
+            }
+            updateCargoDisplay();
+            updateCargoAvailability();
+        }
+
+        // Обновление доступности грузов
+        function updateCargoAvailability() {
+            const cargoCards = document.querySelectorAll('.cargo-card');
+            cargoCards.forEach(card => {
+                const cargoType = card.dataset.type;
+                const price = gameState.isFirstDelivery ? 0 : currentPrices[cargoType];
+                
+                if (gameState.money >= price || gameState.isFirstDelivery) {
+                    card.classList.remove('disabled');
+                } else {
+                    card.classList.add('disabled');
+                }
+            });
+        }
+
+        // Обновление отображения цен
+        function updateCargoDisplay() {
+            grainPriceElement.textContent = `$${currentPrices.grain}`;
+            grainProfitElement.textContent = `$${currentProfits.grain}`;
+            fertilizerPriceElement.textContent = `$${currentPrices.fertilizer}`;
+            fertilizerProfitElement.textContent = `$${currentProfits.fertilizer}`;
+            legoPriceElement.textContent = `$${currentPrices.lego}`;
+            legoProfitElement.textContent = `$${currentProfits.lego}`;
+        }
+
+        // Обновление статистики
+        function updateStats() {
+            moneyElement.textContent = `$${gameState.money}`;
+            distanceElement.textContent = `${Math.round(gameState.totalDistance)} км`;
+            deliveriesElement.textContent = gameState.deliveries;
+            
+            // Обновляем кнопки
+            buyCargoButton.disabled = gameState.currentCargo !== null;
+            upgradeTruckButton.disabled = gameState.money < 500;
+            
+            // Обновляем доступность грузов
+            updateCargoAvailability();
+            
+            // Проверяем смену погоды и биома каждые 1000 км
+            // Используем Math.floor чтобы смена происходила точно на 1000, 2000, 3000 км и т.д.
+            const currentThousand = Math.floor(gameState.totalDistance / 1000);
+            const lastThousand = Math.floor(gameState.lastBiomeChangeAt / 1000);
+            
+            if (currentThousand > lastThousand) {
+                changeWeatherAndBiome();
+                gameState.lastBiomeChangeAt = gameState.totalDistance;
+            }
+        }
+
+        // Смена погоды и биома
+        function changeWeatherAndBiome() {
+            // Сохраняем старые значения
+            const oldWeather = gameState.weatherType;
+            const oldBiome = gameState.biomeType;
+            
+            // Случайно меняем погоду (но не повторяем текущую)
+            let newWeather;
+            do {
+                newWeather = Math.floor(Math.random() * 4);
+            } while (newWeather === oldWeather);
+            gameState.weatherType = newWeather;
+            
+            // Случайно меняем биом (но не повторяем текущий)
+            let newBiome;
+            do {
+                newBiome = Math.floor(Math.random() * 4);
+            } while (newBiome === oldBiome);
+            gameState.biomeType = newBiome;
+            
+            // Обновляем индикатор погоды
+            updateWeatherIndicator();
+            
+            if (oldWeather !== gameState.weatherType) {
+                addEvent(`Погода изменилась: ${getWeatherText(gameState.weatherType)}`);
+            }
+            
+            if (oldBiome !== gameState.biomeType) {
+                addEvent(`Вы въехали в ${getBiomeText(gameState.biomeType)}`);
+            }
+        }
+
+        // Получение текста погоды
+        function getWeatherText(weatherType) {
+            switch(weatherType) {
+                case 0: return "Солнечно ☀️";
+                case 1: return "Дождь 🌧️";
+                case 2: return "Снег ❄️";
+                case 3: return "Ночь 🌙";
+                default: return "Солнечно ☀️";
+            }
+        }
+
+        // Получение текста биома
+        function getBiomeText(biomeType) {
+            switch(biomeType) {
+                case 0: return "лесной массив 🌲";
+                case 1: return "пустыню 🏜️";
+                case 2: return "горную местность ⛰️";
+                case 3: return "равнину 🌾";
+                default: return "лесной массив 🌲";
+            }
+        }
+
+        // Обновление индикатора погоды
+        function updateWeatherIndicator() {
+            const weatherData = getWeatherData(gameState.weatherType);
+            weatherIcon.textContent = weatherData.icon;
+            weatherText.textContent = `Погода: ${weatherData.text} | Местность: ${getBiomeText(gameState.biomeType)}`;
+            weatherIndicator.classList.remove('hidden');
+        }
+
+        // Получение данных о погоде
+        function getWeatherData(weatherType) {
+            switch(weatherType) {
+                case 0: return {icon: "☀️", text: "Солнечно", skyColor: "#87CEEB", roadColor: "#34495e"};
+                case 1: return {icon: "🌧️", text: "Дождь", skyColor: "#5D6D7E", roadColor: "#2C3E50"};
+                case 2: return {icon: "❄️", text: "Снег", skyColor: "#D5D8DC", roadColor: "#7B7D7D"};
+                case 3: return {icon: "🌙", text: "Ночь", skyColor: "#1C2833", roadColor: "#17202A"};
+                default: return {icon: "☀️", text: "Солнечно", skyColor: "#87CEEB", roadColor: "#34495e"};
+            }
+        }
+
+        // Добавление события в лог
+        function addEvent(message) {
+            const eventItem = document.createElement('div');
+            eventItem.className = 'event-item';
+            eventItem.textContent = message;
+            eventList.appendChild(eventItem);
+            
+            // Показываем лог
+            eventLog.classList.remove('hidden');
+            
+            // Автоскролл вниз
+            eventList.scrollTop = eventList.scrollHeight;
+            
+            // Ограничиваем количество событий
+            if (eventList.children.length > 10) {
+                eventList.removeChild(eventList.firstChild);
+            }
+        }
+
+        // Выбор груза
+        let selectedCargo = null;
+        const cargoCards = document.querySelectorAll('.cargo-card');
+        
+        cargoCards.forEach(card => {
+            card.addEventListener('click', () => {
+                if (card.classList.contains('disabled')) return;
+                
+                // Снимаем выделение со всех карточек
+                cargoCards.forEach(c => c.classList.remove('selected'));
+                // Выделяем выбранную
+                card.classList.add('selected');
+                selectedCargo = card.dataset.type;
+                deliverButton.disabled = false;
+            });
+        });
+
+        // Начало доставки
+        deliverButton.addEventListener('click', () => {
+            if (!selectedCargo) return;
+            
+            const cargo = cargoTypes[selectedCargo];
+            const price = gameState.isFirstDelivery ? 0 : currentPrices[selectedCargo];
+            
+            // Проверяем, хватает ли денег (кроме первой доставки)
+            if (gameState.isFirstDelivery || gameState.money >= price) {
+                // Списание денег (кроме первой доставки)
+                if (!gameState.isFirstDelivery) {
+                    gameState.money -= price;
+                    addEvent(`Куплен груз: ${cargo.name} за $${price}`);
+                } else {
+                    addEvent(`Первая доставка: ${cargo.name} (бесплатно)`);
+                    gameState.isFirstDelivery = false;
+                }
+                
+                gameState.currentCargo = selectedCargo;
+                gameState.currentTripDistance = 0;
+                gameState.totalTripDistance = 1000 + (gameState.deliveries * 200); // Увеличиваем дистанцию
+                
+                cargoScreen.classList.add('hidden');
+                gameScreen.classList.remove('hidden');
+                startDelivery();
+                
+                addEvent(`Начата доставка ${cargo.name} на ${gameState.totalTripDistance} км`);
+            } else {
+                addEvent(`Недостаточно денег для покупки ${cargo.name}!`);
+            }
+        });
+
+        // Следующая доставка
+        nextDeliveryButton.addEventListener('click', () => {
+            resultScreen.classList.add('hidden');
+            cargoScreen.classList.remove('hidden');
+            
+            // Увеличиваем цены и прибыль
+            for (const type in cargoTypes) {
+                const cargo = cargoTypes[type];
+                currentPrices[type] = Math.round(currentPrices[type] * cargo.priceMultiplier);
+                currentProfits[type] = Math.round(currentProfits[type] * cargo.profitMultiplier);
+            }
+            
+            updateCargoDisplay();
+            updateStats();
+            
+            // Сбрасываем выбор груза
+            selectedCargo = null;
+            deliverButton.disabled = true;
+            cargoCards.forEach(c => c.classList.remove('selected'));
+        });
+
+        // Покупка груза
+        buyCargoButton.addEventListener('click', () => {
+            cargoScreen.classList.remove('hidden');
+        });
+
+        // Улучшение грузовика
+        upgradeTruckButton.addEventListener('click', () => {
+            if (gameState.money >= 500) {
+                gameState.money -= 500;
+                gameState.truckLevel++;
+                gameState.truckSpeed = 50 + (gameState.truckLevel * 20);
+                addEvent(`Грузовик улучшен до уровня ${gameState.truckLevel}! Скорость увеличена.`);
+                updateStats();
+            }
+        });
+
+        // Музыкальный плеер
+        function initializeMusicPlayer() {
+            playMusicBtn.addEventListener('click', () => {
+                const url = musicUrlInput.value.trim();
+                if (url && url !== currentMusicUrl) {
+                    if (audioPlayer) {
+                        audioPlayer.pause();
+                        audioPlayer = null;
+                    }
+                    
+                    try {
+                        audioPlayer = new Audio(url);
+                        audioPlayer.loop = true;
+                        currentMusicUrl = url;
+                        
+                        audioPlayer.play().then(() => {
+                            musicStatus.textContent = "Музыка играет...";
+                            musicStatus.style.color = "#2ecc71";
+                        }).catch(error => {
+                            musicStatus.textContent = "Ошибка воспроизведения. Проверьте ссылку.";
+                            musicStatus.style.color = "#e74c3c";
+                            console.error("Ошибка воспроизведения:", error);
+                        });
+                    } catch (error) {
+                        musicStatus.textContent = "Некорректная ссылка на музыку";
+                        musicStatus.style.color = "#e74c3c";
+                    }
+                } else if (audioPlayer && currentMusicUrl) {
+                    audioPlayer.play();
+                    musicStatus.textContent = "Музыка играет...";
+                    musicStatus.style.color = "#2ecc71";
+                }
+            });
+            
+            pauseMusicBtn.addEventListener('click', () => {
+                if (audioPlayer && !audioPlayer.paused) {
+                    audioPlayer.pause();
+                    musicStatus.textContent = "Музыка на паузе";
+                    musicStatus.style.color = "#f39c12";
+                }
+            });
+            
+            stopMusicBtn.addEventListener('click', () => {
+                if (audioPlayer) {
+                    audioPlayer.pause();
+                    audioPlayer.currentTime = 0;
+                    musicStatus.textContent = "Музыка остановлена";
+                    musicStatus.style.color = "#e74c3c";
+                }
+            });
+            
+            // Предустановленная музыка (по желанию)
+            musicUrlInput.placeholder = "Вставьте ссылку на музыку (MP3) или оставьте пустым";
+        }
+
+        // Начало доставки
+        function startDelivery() {
+            // Устанавливаем размер canvas
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            
+            // Сбрасываем анимационные переменные
+            truckX = 100;
+            backgroundOffset = 0;
+            lastUpdateTime = performance.now();
+            
+            // Показываем индикатор погоды
+            updateWeatherIndicator();
+            
+            // Запускаем игровой цикл
+            if (animationId) {
+                cancelAnimationFrame(animationId);
+            }
+            animationId = requestAnimationFrame(gameLoop);
+        }
+
+        // Игровой цикл
+        function gameLoop(currentTime) {
+            const deltaTime = (currentTime - lastUpdateTime) / 1000; // В секундах
+            lastUpdateTime = currentTime;
+            
+            // Обновление игры
+            updateGame(deltaTime);
+            
+            // Отрисовка
+            drawGame();
+            
+            // Продолжаем анимацию, если доставка не завершена
+            if (gameState.currentTripDistance < gameState.totalTripDistance) {
+                animationId = requestAnimationFrame(gameLoop);
+            } else {
+                finishDelivery();
+            }
+        }
+
+        function updateGame(deltaTime) {
+            // Увеличиваем пройденное расстояние (в км)
+            const distanceThisFrame = (gameState.truckSpeed * deltaTime) / 3.6; // Переводим в км
+            gameState.currentTripDistance += distanceThisFrame;
+            gameState.totalDistance += distanceThisFrame;
+            
+            // Обновляем анимационные переменные
+            backgroundOffset += gameState.truckSpeed * deltaTime * 2;
+            if (backgroundOffset > canvas.width) {
+                backgroundOffset = 0;
+            }
+            
+            // Обновляем прогресс
+            const progress = (gameState.currentTripDistance / gameState.totalTripDistance) * 100;
+            progressFill.style.width = `${progress}%`;
+            remainingDistanceElement.textContent = Math.max(0, Math.round(gameState.totalTripDistance - gameState.currentTripDistance));
+            currentCargoElement.textContent = cargoTypes[gameState.currentCargo].name;
+            
+            updateStats();
+        }
+
+        function drawGame() {
+            const weatherData = getWeatherData(gameState.weatherType);
+            
+            // Очистка canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Рисуем небо в зависимости от погоды
+            const skyGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            skyGradient.addColorStop(0, weatherData.skyColor);
+            skyGradient.addColorStop(1, lightenColor(weatherData.skyColor, 30));
+            ctx.fillStyle = skyGradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height - 100);
+            
+            // Рисуем дорогу в зависимости от погоды
+            ctx.fillStyle = weatherData.roadColor;
+            ctx.fillRect(0, canvas.height - 100, canvas.width, 100);
+            
+            // Рисуем разметку (движущуюся)
+            ctx.fillStyle = (gameState.weatherType === 3) ? '#f39c12' : '#ffffff'; // Ночью желтая разметка
+            for (let i = -backgroundOffset % 40; i < canvas.width; i += 40) {
+                ctx.fillRect(i, canvas.height - 50, 20, 5);
+            }
+            
+            // Рисуем пейзаж в зависимости от биома
+            drawBiome();
+            
+            // Рисуем погодные эффекты
+            drawWeatherEffects();
+            
+            // Рисуем грузовик
+            drawTruck();
+        }
+
+        function drawBiome() {
+            const biomeColors = {
+                0: { // Лес
+                    ground: '#27ae60',
+                    objects: '#2ecc71',
+                    detail: '#229954'
+                },
+                1: { // Пустыня
+                    ground: '#f39c12',
+                    objects: '#e67e22',
+                    detail: '#d35400'
+                },
+                2: { // Горы
+                    ground: '#7f8c8d',
+                    objects: '#95a5a6',
+                    detail: '#5d6d7e'
+                },
+                3: { // Равнина
+                    ground: '#2ecc71',
+                    objects: '#27ae60',
+                    detail: '#229954'
+                }
+            };
+            
+            const colors = biomeColors[gameState.biomeType] || biomeColors[0];
+            
+            // Рисуем землю
+            ctx.fillStyle = colors.ground;
+            ctx.fillRect(0, canvas.height - 100, canvas.width, 30);
+            
+            // Рисуем элементы биома
+            switch(gameState.biomeType) {
+                case 0: // Лес - деревья
+                    for (let i = -backgroundOffset % 150; i < canvas.width; i += 150) {
+                        drawTree(i, canvas.height - 120);
+                    }
+                    break;
+                case 1: // Пустыня - кактусы
+                    for (let i = -backgroundOffset % 120; i < canvas.width; i += 120) {
+                        drawCactus(i, canvas.height - 110);
+                    }
+                    break;
+                case 2: // Горы - скалы
+                    for (let i = -backgroundOffset % 200; i < canvas.width; i += 200) {
+                        drawMountain(i, canvas.height - 120);
+                    }
+                    break;
+                case 3: // Равнина - кусты
+                    for (let i = -backgroundOffset % 100; i < canvas.width; i += 100) {
+                        drawBush(i, canvas.height - 110);
+                    }
+                    break;
+            }
+        }
+
+        function drawTree(x, y) {
+            ctx.fillStyle = '#8B4513';
+            ctx.fillRect(x, y, 10, 40);
+            ctx.fillStyle = '#27ae60';
+            ctx.beginPath();
+            ctx.arc(x + 5, y - 15, 25, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        function drawCactus(x, y) {
+            ctx.fillStyle = '#27ae60';
+            ctx.fillRect(x, y, 15, 50);
+            ctx.fillRect(x - 10, y + 10, 10, 15);
+            ctx.fillRect(x + 15, y + 20, 10, 15);
+        }
+
+        function drawMountain(x, y) {
+            ctx.fillStyle = '#7f8c8d';
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            ctx.lineTo(x + 60, y - 40);
+            ctx.lineTo(x + 120, y);
+            ctx.fill();
+        }
+
+        function drawBush(x, y) {
+            ctx.fillStyle = '#229954';
+            ctx.beginPath();
+            ctx.arc(x, y, 15, 0, Math.PI * 2);
+            ctx.arc(x + 15, y - 5, 12, 0, Math.PI * 2);
+            ctx.arc(x - 10, y - 5, 12, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        function drawWeatherEffects() {
+            if (gameState.weatherType === 1) { // Дождь
+                ctx.strokeStyle = 'rgba(173, 216, 230, 0.7)';
+                ctx.lineWidth = 1;
+                for (let i = 0; i < 50; i++) {
+                    const x = (i * 20 + backgroundOffset * 2) % canvas.width;
+                    const y = (i * 15 + backgroundOffset) % canvas.height;
+                    ctx.beginPath();
+                    ctx.moveTo(x, y);
+                    ctx.lineTo(x - 5, y + 20);
+                    ctx.stroke();
+                }
+            } else if (gameState.weatherType === 2) { // Снег
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+                for (let i = 0; i < 30; i++) {
+                    const x = (i * 30 + backgroundOffset * 1.5) % canvas.width;
+                    const y = (i * 20 + backgroundOffset) % canvas.height;
+                    ctx.beginPath();
+                    ctx.arc(x, y, 2, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            } else if (gameState.weatherType === 3) { // Ночь - звёзды
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+                for (let i = 0; i < 20; i++) {
+                    const x = (i * 40) % canvas.width;
+                    const y = (i * 20) % (canvas.height - 100);
+                    ctx.beginPath();
+                    ctx.arc(x, y, 1, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+        }
+
+        function drawTruck() {
+            const truckY = canvas.height - 150;
+            
+            // Кузов грузовика - ОРАНЖЕВЫЙ
+            ctx.fillStyle = '#FF8C00'; // Темно-оранжевый
+            ctx.fillRect(truckX, truckY, 120, 50);
+            
+            // Кабина - немного темнее оранжевый
+            ctx.fillStyle = '#FF7F00';
+            ctx.fillRect(truckX + 80, truckY - 30, 40, 30);
+            
+            // Окна
+            ctx.fillStyle = '#aed6f1';
+            ctx.fillRect(truckX + 85, truckY - 25, 30, 15);
+            
+            // Фары
+            ctx.fillStyle = '#f1c40f';
+            ctx.fillRect(truckX, truckY + 10, 10, 5);
+            
+            // Задние фонари
+            ctx.fillStyle = '#e74c3c';
+            ctx.fillRect(truckX + 120, truckY + 10, 5, 10);
+            
+            // Колёса
+            ctx.fillStyle = '#2c3e50';
+            ctx.beginPath();
+            ctx.arc(truckX + 30, truckY + 50, 15, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(truckX + 90, truckY + 50, 15, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Диски
+            ctx.fillStyle = '#7f8c8d';
+            ctx.beginPath();
+            ctx.arc(truckX + 30, truckY + 50, 8, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(truckX + 90, truckY + 50, 8, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Груз (в зависимости от типа)
+            const cargo = cargoTypes[gameState.currentCargo];
+            ctx.fillStyle = getCargoColor(gameState.currentCargo);
+            ctx.fillRect(truckX + 10, truckY - 20, 60, 15);
+            
+            // Иконка груза
+            ctx.font = '20px Arial';
+            ctx.fillText(cargo.icon, truckX + 35, truckY - 5);
+        }
+
+        function getCargoColor(cargoType) {
+            switch(cargoType) {
+                case 'grain': return '#f1c40f';
+                case 'fertilizer': return '#27ae60';
+                case 'lego': return '#e74c3c';
+                default: return '#3498db';
+            }
+        }
+
+        function lightenColor(color, percent) {
+            const num = parseInt(color.replace("#", ""), 16);
+            const amt = Math.round(2.55 * percent);
+            const R = (num >> 16) + amt;
+            const G = (num >> 8 & 0x00FF) + amt;
+            const B = (num & 0x0000FF) + amt;
+            return `#${(
+                0x1000000 + 
+                (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 + 
+                (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 + 
+                (B < 255 ? B < 1 ? 0 : B : 255)
+            ).toString(16).slice(1)}`;
+        }
+
+        function finishDelivery() {
+            if (animationId) {
+                cancelAnimationFrame(animationId);
+                animationId = null;
+            }
+            
+            const cargo = cargoTypes[gameState.currentCargo];
+            const profit = currentProfits[gameState.currentCargo];
+            
+            // Начисляем прибыль
+            gameState.money += profit;
+            gameState.deliveries++;
+            gameState.currentCargo = null;
+            
+            // Показываем экран результатов
+            gameScreen.classList.add('hidden');
+            resultScreen.classList.remove('hidden');
+            
+            deliveredCargoElement.textContent = cargo.name;
+            earnedMoneyElement.textContent = `$${profit}`;
+            totalMoneyElement.textContent = `$${gameState.money}`;
+            
+            addEvent(`Доставка завершена! Заработано: $${profit}`);
+            
+            updateStats();
+        }
+
+        // Инициализация игры
+        startButton.addEventListener('click', () => {
+            startScreen.classList.add('hidden');
+            cargoScreen.classList.remove('hidden');
+            initializePrices();
+            
+            // Сбрасываем расстояние последней смены
+            gameState.lastBiomeChangeAt = 0;
+            
+            // Устанавливаем начальную погоду и биом
+            gameState.weatherType = 0; // солнечно
+            gameState.biomeType = 0; // лес
+            
+            updateStats();
+            initializeMusicPlayer();
+            addEvent("Добро пожаловать в мир дальнобойщиков!");
+            addEvent(`Начальная погода: ${getWeatherText(gameState.weatherType)}`);
+            addEvent(`Начальная местность: ${getBiomeText(gameState.biomeType)}`);
+        });
+
+        // Адаптация размера canvas
+        window.addEventListener('resize', () => {
+            if (gameScreen.classList.contains('hidden')) return;
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+        });
+    </script>
+</body>
+</html>
