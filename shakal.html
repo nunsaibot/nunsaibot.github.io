@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Инструмент для пикселизации фото</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(to right, #2c3e50, #4a6491);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .content {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 20px;
+            gap: 20px;
+        }
+        
+        .upload-section, .controls, .preview-section {
+            flex: 1;
+            min-width: 300px;
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .section-title {
+            font-size: 1.4rem;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+        }
+        
+        .file-input-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        
+        .file-input {
+            width: 100%;
+            height: 50px;
+            border: 2px dashed #3498db;
+            border-radius: 8px;
+            padding: 10px;
+            font-size: 1rem;
+            background-color: #f8f9fa;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .file-input:hover {
+            background-color: #e8f4fc;
+            border-color: #2980b9;
+        }
+        
+        .slider-container {
+            margin: 25px 0;
+        }
+        
+        .slider {
+            width: 100%;
+            height: 12px;
+            -webkit-appearance: none;
+            background: linear-gradient(to right, #1abc9c, #3498db, #9b59b6);
+            border-radius: 10px;
+            outline: none;
+            margin: 15px 0;
+        }
+        
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: #e74c3c;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            transition: all 0.2s;
+        }
+        
+        .slider::-webkit-slider-thumb:hover {
+            background: #c0392b;
+            transform: scale(1.1);
+        }
+        
+        .slider-value {
+            text-align: center;
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 10px 0;
+        }
+        
+        .level-description {
+            text-align: center;
+            font-style: italic;
+            color: #7f8c8d;
+            margin-top: 5px;
+            min-height: 24px;
+        }
+        
+        .canvas-container {
+            display: flex;
+            justify-content: center;
+            margin: 15px 0;
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 10px;
+            min-height: 200px;
+            align-items: center;
+        }
+        
+        canvas {
+            max-width: 100%;
+            border-radius: 5px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .placeholder-text {
+            color: #95a5a6;
+            text-align: center;
+            font-style: italic;
+        }
+        
+        button {
+            background: linear-gradient(to right, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3);
+            display: block;
+            width: 100%;
+            margin: 10px 0;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(52, 152, 219, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .download-btn {
+            background: linear-gradient(to right, #2ecc71, #27ae60);
+            box-shadow: 0 4px 10px rgba(46, 204, 113, 0.3);
+        }
+        
+        .download-btn:hover {
+            box-shadow: 0 6px 15px rgba(46, 204, 113, 0.4);
+        }
+        
+        .reset-btn {
+            background: linear-gradient(to right, #e74c3c, #c0392b);
+            box-shadow: 0 4px 10px rgba(231, 76, 60, 0.3);
+        }
+        
+        .reset-btn:hover {
+            box-shadow: 0 6px 15px rgba(231, 76, 60, 0.4);
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .instructions {
+            background: #e8f4fc;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            border-top: 1px solid #eee;
+        }
+        
+        @media (max-width: 768px) {
+            .content {
+                flex-direction: column;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Пикселизатор фото</h1>
+            <p class="subtitle">Превратите любое изображение в пиксельное искусство</p>
+        </header>
+        
+        <div class="content">
+            <div class="upload-section">
+                <h2 class="section-title">1. Загрузите фото</h2>
+                <div class="file-input-container">
+                    <input type="file" id="imageInput" class="file-input" accept="image/*">
+                </div>
+                
+                <div class="instructions">
+                    <p>Выберите изображение с вашего устройства (JPG, PNG, GIF)</p>
+                </div>
+                
+                <div class="controls hidden" id="controls">
+                    <h2 class="section-title">2. Настройте уровень пикселизации</h2>
+                    <div class="slider-container">
+                        <input type="range" id="pixelSlider" class="slider" min="1" max="20" value="1">
+                        <div class="slider-value">Уровень: <span id="sliderValue">1</span></div>
+                        <div class="level-description" id="levelDescription">Минимальная пикселизация</div>
+                    </div>
+                    
+                    <button id="applyBtn">Применить пикселизацию</button>
+                    <button id="resetBtn" class="reset-btn">Сбросить</button>
+                </div>
+            </div>
+            
+            <div class="preview-section">
+                <h2 class="section-title">3. Результат</h2>
+                <div class="canvas-container">
+                    <canvas id="resultCanvas"></canvas>
+                    <div id="placeholder" class="placeholder-text">
+                        Загрузите изображение и примените пикселизацию
+                    </div>
+                </div>
+                
+                <button id="downloadBtn" class="download-btn hidden">Скачать результат</button>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Инструмент для пикселизации изображений &copy; 2023</p>
+        </footer>
+    </div>
+
+    <script>
+        // Элементы DOM
+        const imageInput = document.getElementById('imageInput');
+        const controls = document.getElementById('controls');
+        const pixelSlider = document.getElementById('pixelSlider');
+        const sliderValue = document.getElementById('sliderValue');
+        const levelDescription = document.getElementById('levelDescription');
+        const applyBtn = document.getElementById('applyBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const resultCanvas = document.getElementById('resultCanvas');
+        const placeholder = document.getElementById('placeholder');
+        const ctx = resultCanvas.getContext('2d');
+        
+        let originalImage = null;
+        let processedImage = null;
+        
+        // Описания уровней
+        const levelDescriptions = [
+            "Минимальная пикселизация",
+            "Едва заметные пиксели",
+            "Слабая пикселизация",
+            "Легкая блочность",
+            "Заметные пиксели",
+            "Средняя пикселизация",
+            "Выраженная блочность",
+            "Сильная пикселизация",
+            "Крупные блоки пикселей",
+            "Очень сильная пикселизация",
+            "Эффект мозаики",
+            "Крупная мозаика",
+            "Очень крупные пиксели",
+            "Сильный эффект 8-битной графики",
+            "Почти абстрактное изображение",
+            "Абстрактная пиксельная графика",
+            "Сильно размытые детали",
+            "Едва угадывается исходное изображение",
+            "Почти неразличимые формы",
+            "Максимальная пикселизация - полная абстракция"
+        ];
+        
+        // Обновление описания уровня
+        function updateLevelDescription() {
+            const level = parseInt(pixelSlider.value) - 1;
+            levelDescription.textContent = levelDescriptions[level];
+        }
+        
+        // Обработчик изменения слайдера
+        pixelSlider.addEventListener('input', function() {
+            sliderValue.textContent = this.value;
+            updateLevelDescription();
+        });
+        
+        // Загрузка изображения
+        imageInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                originalImage = new Image();
+                originalImage.onload = function() {
+                    // Устанавливаем размеры canvas
+                    const maxWidth = 500;
+                    const ratio = Math.min(maxWidth / originalImage.width, 1);
+                    resultCanvas.width = originalImage.width * ratio;
+                    resultCanvas.height = originalImage.height * ratio;
+                    
+                    // Показываем элементы управления
+                    controls.classList.remove('hidden');
+                    placeholder.classList.add('hidden');
+                    
+                    // Рисуем оригинальное изображение
+                    ctx.drawImage(originalImage, 0, 0, resultCanvas.width, resultCanvas.height);
+                    
+                    // Сохраняем оригинальное изображение как processedImage
+                    processedImage = new Image();
+                    processedImage.src = resultCanvas.toDataURL();
+                };
+                originalImage.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+        
+        // Применение эффекта пикселизации
+        applyBtn.addEventListener('click', function() {
+            if (!originalImage) return;
+            
+            const level = parseInt(pixelSlider.value);
+            
+            // Очищаем canvas
+            ctx.clearRect(0, 0, resultCanvas.width, resultCanvas.height);
+            
+            // Рисуем оригинальное изображение
+            ctx.drawImage(originalImage, 0, 0, resultCanvas.width, resultCanvas.height);
+            
+            // Применяем эффект пикселизации
+            applyPixelation(level);
+            
+            // Показываем кнопку скачивания
+            downloadBtn.classList.remove('hidden');
+            
+            // Сохраняем обработанное изображение
+            processedImage = new Image();
+            processedImage.src = resultCanvas.toDataURL();
+        });
+        
+        // Функция применения эффекта пикселизации
+        function applyPixelation(level) {
+            const imageData = ctx.getImageData(0, 0, resultCanvas.width, resultCanvas.height);
+            const data = imageData.data;
+            
+            // Размер блока пикселей зависит от уровня
+            // Минимальный размер 2px, максимальный 40px
+            const blockSize = Math.floor(2 + (level * 2));
+            
+            // Проходим по изображению блоками
+            for (let y = 0; y < resultCanvas.height; y += blockSize) {
+                for (let x = 0; x < resultCanvas.width; x += blockSize) {
+                    // Получаем средний цвет блока
+                    const avgColor = getBlockAverageColor(data, x, y, blockSize, resultCanvas.width);
+                    
+                    // Заполняем блок средним цветом
+                    fillBlock(data, x, y, blockSize, resultCanvas.width, avgColor);
+                }
+            }
+            
+            // Применяем изменения к canvas
+            ctx.putImageData(imageData, 0, 0);
+        }
+        
+        // Функция для получения среднего цвета блока
+        function getBlockAverageColor(data, startX, startY, blockSize, width) {
+            let r = 0, g = 0, b = 0, a = 0;
+            let count = 0;
+            
+            for (let y = startY; y < startY + blockSize && y < resultCanvas.height; y++) {
+                for (let x = startX; x < startX + blockSize && x < resultCanvas.width; x++) {
+                    const idx = (y * width + x) * 4;
+                    r += data[idx];
+                    g += data[idx + 1];
+                    b += data[idx + 2];
+                    a += data[idx + 3];
+                    count++;
+                }
+            }
+            
+            return {
+                r: Math.floor(r / count),
+                g: Math.floor(g / count),
+                b: Math.floor(b / count),
+                a: Math.floor(a / count)
+            };
+        }
+        
+        // Функция для заполнения блока цветом
+        function fillBlock(data, startX, startY, blockSize, width, color) {
+            for (let y = startY; y < startY + blockSize && y < resultCanvas.height; y++) {
+                for (let x = startX; x < startX + blockSize && x < resultCanvas.width; x++) {
+                    const idx = (y * width + x) * 4;
+                    data[idx] = color.r;
+                    data[idx + 1] = color.g;
+                    data[idx + 2] = color.b;
+                    data[idx + 3] = color.a;
+                }
+            }
+        }
+        
+        // Сброс к оригинальному изображению
+        resetBtn.addEventListener('click', function() {
+            if (!originalImage) return;
+            
+            ctx.clearRect(0, 0, resultCanvas.width, resultCanvas.height);
+            ctx.drawImage(originalImage, 0, 0, resultCanvas.width, resultCanvas.height);
+            
+            // Сбрасываем слайдер
+            pixelSlider.value = 1;
+            sliderValue.textContent = '1';
+            updateLevelDescription();
+            
+            // Скрываем кнопку скачивания
+            downloadBtn.classList.add('hidden');
+            
+            // Сохраняем оригинальное изображение как processedImage
+            processedImage = new Image();
+            processedImage.src = resultCanvas.toDataURL();
+        });
+        
+        // Скачивание результата
+        downloadBtn.addEventListener('click', function() {
+            if (!processedImage) return;
+            
+            const link = document.createElement('a');
+            link.download = 'пикселизированное_фото.png';
+            link.href = processedImage.src;
+            link.click();
+        });
+        
+        // Инициализация описания уровня
+        updateLevelDescription();
+    </script>
+</body>
+</html>
