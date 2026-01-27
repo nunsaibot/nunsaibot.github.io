@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>ЖЕЛТАЯ ПРЕССА 2007</title>
+    <style>
+        body { background: yellow; font-family: Arial; }
+        .header { background: red; color: white; padding: 20px; text-align: center; }
+        .news { background: white; margin: 20px; padding: 15px; border: 3px solid red; }
+        .breaking { background: orange; color: black; padding: 10px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>ЖЕЛТАЯ ПРЕССА 2007</h1>
+        <p>Самые горячие новости!</p>
+    </div>
+    
+    <div id="news-container">
+        <p>Загрузка новостей...</p>
+    </div>
+    
+    <script>
+        // ЗАМЕНИТЕ ЭТОТ URL НА СВОЙ:
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzsmtY4gcUDJP1XTnGcz4xtQ3s0dVHYB-eWs_n0y5oCkpo9FT0OQtSdBvkJoegI0CAgOQ/exec';
+        
+        async function loadNews() {
+            try {
+                const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=get`);
+                const data = await response.json();
+                
+                const container = document.getElementById('news-container');
+                container.innerHTML = '';
+                
+                if (data.news && data.news.length > 0) {
+                    data.news.forEach(news => {
+                        const div = document.createElement('div');
+                        div.className = 'news';
+                        
+                        if (news.isBreaking) {
+                            div.innerHTML = `<div class="breaking">⚡ СРОЧНО!</div>`;
+                        }
+                        
+                        div.innerHTML += `
+                            <h2>${news.title || 'Без названия'}</h2>
+                            <p>${news.content || 'Нет содержания'}</p>
+                            <small>${news.date || 'Сегодня'}</small>
+                            <hr>
+                        `;
+                        
+                        container.appendChild(div);
+                    });
+                } else {
+                    container.innerHTML = '<p>Новостей пока нет. Добавьте первую!</p>';
+                }
+            } catch (error) {
+                document.getElementById('news-container').innerHTML = 
+                    '<p>Ошибка загрузки новостей</p>';
+            }
+        }
+        
+        // Обновлять каждые 30 секунд
+        setInterval(loadNews, 30000);
+        
+        // Загрузить сразу
+        loadNews();
+    </script>
+</body>
+</html>
