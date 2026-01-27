@@ -1,209 +1,1326 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>INTELEKTUAL TV</title>
     <style>
         body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
             margin: 0;
+            padding: 0;
             background-color: #000000;
+            overflow: hidden;
+            font-family: 'Courier New', monospace;
         }
-        svg {
-            border: 1px solid black;
-            padding: 20px;
+        
+        #tvFrame {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 1280px;
+            height: 720px;
+            border: 3px solid #00ff00;
+            box-shadow: 
+                0 0 30px #00ff00,
+                inset 0 0 30px rgba(0, 255, 0, 0.3);
+            background: #000;
+            overflow: hidden;
         }
-        /* Анимация для линий */
+        
+        #canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+        
+        .info {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            color: #00ff00;
+            font-size: 12px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 5px 10px;
+            border-radius: 3px;
+            z-index: 100;
+        }
+        
+        .title {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #00ff00;
+            font-size: 24px;
+            text-shadow: 0 0 10px #00ff00;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 5px 20px;
+            border-radius: 5px;
+            z-index: 100;
+            letter-spacing: 2px;
+        }
+        
+        .music-controls {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #00ff00;
+            z-index: 100;
+        }
+        
+        .music-controls button {
+            background: #00ff00;
+            color: #000;
+            border: none;
+            padding: 5px 10px;
+            margin: 2px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+        }
+        
+        .music-controls button:hover {
+            background: #90ee90;
+        }
+        
+        .music-info {
+            color: #00ff00;
+            font-size: 11px;
+            margin-top: 5px;
+            text-align: center;
+        }
+        
+        .scanlines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background: linear-gradient(
+                to bottom,
+                transparent 50%,
+                rgba(0, 255, 0, 0.05) 51%
+            );
+            background-size: 100% 4px;
+            z-index: 90;
+            animation: scanlines 10s linear infinite;
+        }
+        
+        @keyframes scanlines {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(4px); }
+        }
+        
+        /* Анимации для фигур */
         @keyframes growLine {
-            from { stroke-dasharray: 0; }
-            to { stroke-dasharray: 100%; }
+            from { stroke-dashoffset: 1000; }
+            to { stroke-dashoffset: 0; }
         }
-        /* Анимация для кругов */
+        
         @keyframes growCircle {
-            from { r: 0; }
-            to { r: 35; }
+            from { 
+                r: 0;
+                opacity: 0;
+            }
+            to { 
+                r: var(--target-radius);
+                opacity: 1;
+            }
         }
-        /* Анимация для прямоугольников */
+        
         @keyframes growRect {
-            from { width: 0; height: 0; }
-            to { width: 100%; height: 100%; }
+            from { 
+                width: 0;
+                height: 0;
+                opacity: 0;
+            }
+            to { 
+                width: var(--target-width);
+                height: var(--target-height);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes rotateShape {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+        
+        @keyframes fractalGrow {
+            from { 
+                transform: scale(0) rotate(0deg);
+                opacity: 0;
+            }
+            to { 
+                transform: scale(1) rotate(360deg);
+                opacity: 0.8;
+            }
+        }
+        
+        @keyframes spiralGrow {
+            from { 
+                stroke-dashoffset: 1000;
+                opacity: 0;
+            }
+            to { 
+                stroke-dashoffset: 0;
+                opacity: 1;
+            }
+        }
+        
+        .fractal-path {
+            animation: fractalGrow 2s ease-out forwards;
+            transform-origin: center;
+        }
+        
+        .spiral-path {
+            animation: spiralGrow 3s ease-out forwards;
+            stroke-dasharray: 1000;
+        }
+        
+        .visualizer {
+            position: absolute;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 400px;
+            height: 60px;
+            z-index: 95;
+            opacity: 0.7;
         }
     </style>
 </head>
 <body>
-    <svg id="canvas" width="1280" height="720"></svg>
+    <div class="title">INTELEKTUAL TV</div>
+    <div id="tvFrame">
+        <svg id="canvas" width="1280" height="720"></svg>
+        <div class="scanlines"></div>
+        <canvas id="visualizer" class="visualizer" width="400" height="60"></canvas>
+    </div>
+    <div class="info" id="info">Фигур: 0 | FPS: 60 | Мелодия: Нет</div>
+    
+    <div class="music-controls">
+        <button id="playMelody">▶️ Воспроизвести</button>
+        <button id="stopMelody">⏹️ Остановить</button>
+        <button id="newMelody">🎵 Новая мелодия</button>
+        <button id="toggleAuto">🔁 Авто: ВКЛ</button>
+        <div class="music-info" id="musicInfo">Темп: 120 | Гамма: C мажор</div>
+    </div>
 
     <script>
         const canvas = document.getElementById('canvas');
-        const shapes = ['line', 'circle', 'rect'];
-        const colors = ['#e74c3c', '#3498db', '#2ecc71', '#9b59b6', '#f1c40f', '#34495e', '#00FF00','#90EE90','#808000', '#FF1493', '#FF4500', '#FFD700', '#FFFF00', '#4B0082', '#7B68EE'];
-
-        // Функция для воспроизведения случайного звука
-        function playRandomSound() {
-            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-
-            // Случайный выбор типа звука
-            const soundType = Math.floor(Math.random() * 4); // 0-3: тон, шум, аккорд, эффект
-
-            switch (soundType) {
-                case 0:
-                    playRandomTone(audioContext); // Случайный тон
-                    break;
-                case 1:
-                    playRandomNoise(audioContext); // Случайный шум
-                    break;
-                case 2:
-                    playRandomChord(audioContext); // Случайный аккорд
-                    break;
-                case 3:
-                    playRandomEffect(audioContext); // Случайный эффект
-                    break;
+        const visualizerCanvas = document.getElementById('visualizer');
+        const visualizerCtx = visualizerCanvas.getContext('2d');
+        const info = document.getElementById('info');
+        const musicInfo = document.getElementById('musicInfo');
+        
+        const colors = [
+            '#e74c3c', '#3498db', '#2ecc71', '#9b59b6', '#f1c40f', 
+            '#34495e', '#00FF00', '#90EE90', '#808000', '#FF1493', 
+            '#FF4500', '#FFD700', '#FFFF00', '#4B0082', '#7B68EE',
+            '#FF00FF', '#00FFFF', '#FF6347', '#7CFC00', '#FFD700',
+            '#DA70D6', '#20B2AA', '#FF69B4', '#6495ED', '#DC143C'
+        ];
+        
+        // Типы фигур и фракталов
+        const shapeTypes = [
+            'line', 'circle', 'rect', 'triangle', 'star', 
+            'hexagon', 'spiral', 'mandala', 'snowflake', 'fractal_tree',
+            'koch_curve', 'sierpinski', 'lorenz', 'julia', 'mandelbrot',
+            'heart', 'infinity', 'flower', 'wave', 'galaxy'
+        ];
+        
+        // Музыкальные гаммы
+        const scales = {
+            'C major': [261.63, 293.66, 329.63, 349.23, 392.00, 440.00, 493.88, 523.25],
+            'A minor': [220.00, 246.94, 261.63, 293.66, 329.63, 349.23, 392.00, 440.00],
+            'G major': [196.00, 220.00, 246.94, 261.63, 293.66, 329.63, 369.99, 392.00],
+            'E minor': [164.81, 185.00, 196.00, 220.00, 246.94, 261.63, 293.66, 329.63],
+            'Pentatonic': [261.63, 293.66, 329.63, 392.00, 440.00, 523.25],
+            'Chromatic': Array.from({length: 24}, (_, i) => 220 * Math.pow(2, i/12)),
+            'Blues': [261.63, 293.66, 311.13, 349.23, 392.00, 466.16, 523.25]
+        };
+        
+        // Музыкальные стили
+        const styles = ['ambient', 'electronic', 'classical', 'jazz', 'techno', 'random'];
+        
+        // Переменные для статистики
+        let shapeCount = 0;
+        let frameCount = 0;
+        let lastFpsUpdate = Date.now();
+        let fps = 60;
+        
+        // Музыкальные переменные
+        let audioContext;
+        let currentMelody = null;
+        let isPlaying = false;
+        let autoPlay = true;
+        let currentScale = 'C major';
+        let currentStyle = 'electronic';
+        let tempo = 120;
+        let melodyNotes = [];
+        let melodyStartTime = 0;
+        let nextNoteTime = 0;
+        let noteIndex = 0;
+        
+        // Инициализация аудио
+        function initAudio() {
+            try {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            } catch (e) {
+                console.log('Web Audio API не поддерживается');
             }
         }
-
-        // Функция для воспроизведения случайного тона
-        function playRandomTone(audioContext) {
-            const oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
-
-            oscillator.type = ['sine', 'square', 'triangle', 'sawtooth'][Math.floor(Math.random() * 4)]; // Случайный тип волны
-            oscillator.frequency.setValueAtTime(Math.random() * 1000 + 100, audioContext.currentTime); // Случайная частота (100-1100 Гц)
-            gainNode.gain.setValueAtTime(0.5, audioContext.currentTime); // Громкость
-
-            oscillator.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-
-            oscillator.start();
-            oscillator.stop(audioContext.currentTime + 0.5 + Math.random() * 1); // Случайная длительность (0.5-1.5 секунды)
-        }
-
-        // Функция для воспроизведения случайного шума
-        function playRandomNoise(audioContext) {
-            const bufferSize = 4096;
-            const noiseBuffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
-            const output = noiseBuffer.getChannelData(0);
-
-            for (let i = 0; i < bufferSize; i++) {
-                output[i] = Math.random() * 2 - 1; // Генерация белого шума
+        
+        // Функция обновления статистики
+        function updateStats() {
+            frameCount++;
+            const now = Date.now();
+            if (now - lastFpsUpdate >= 1000) {
+                fps = Math.round((frameCount * 1000) / (now - lastFpsUpdate));
+                frameCount = 0;
+                lastFpsUpdate = now;
+                
+                const melodyStatus = isPlaying ? 'Играет' : 'Стоп';
+                info.textContent = `Фигур: ${shapeCount} | FPS: ${fps} | Мелодия: ${melodyStatus}`;
             }
-
-            const noiseSource = audioContext.createBufferSource();
-            noiseSource.buffer = noiseBuffer;
-
-            const gainNode = audioContext.createGain();
-            gainNode.gain.setValueAtTime(0.1, audioContext.currentTime); // Громкость
-
-            noiseSource.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-
-            noiseSource.start();
-            noiseSource.stop(audioContext.currentTime + 0.5 + Math.random() * 1); // Случайная длительность (0.5-1.5 секунды)
         }
-
-        // Функция для воспроизведения случайного аккорда
-        function playRandomChord(audioContext) {
-            const frequencies = [
-                261.63, 329.63, 392.00, // C4, E4, G4 (мажорный аккорд)
-                293.66, 369.99, 440.00, // D4, F#4, A4 (мажорный аккорд)
-                329.63, 415.30, 493.88  // E4, G#4, B4 (мажорный аккорд)
+        
+        // Генерация случайной мелодии
+        function generateMelody() {
+            if (!audioContext) return null;
+            
+            // Выбираем случайную гамму и стиль
+            const scaleNames = Object.keys(scales);
+            currentScale = scaleNames[Math.floor(Math.random() * scaleNames.length)];
+            currentStyle = styles[Math.floor(Math.random() * styles.length)];
+            tempo = 80 + Math.floor(Math.random() * 80);
+            
+            const scale = scales[currentScale];
+            melodyNotes = [];
+            
+            // Генерируем последовательность нот
+            const noteCount = 16 + Math.floor(Math.random() * 16);
+            const rhythmPatterns = [
+                [1, 1, 1, 1], // равные
+                [1, 0.5, 0.5, 1], // синкопы
+                [2, 1, 0.5, 0.5], // сложный ритм
+                [1.5, 0.5, 1, 1] // свинг
             ];
-
-            const chord = [];
-            for (let i = 0; i < 3; i++) {
-                chord.push(frequencies[Math.floor(Math.random() * frequencies.length)]); // Случайные ноты из списка
+            
+            const rhythm = rhythmPatterns[Math.floor(Math.random() * rhythmPatterns.length)];
+            
+            for (let i = 0; i < noteCount; i++) {
+                // Выбор ноты из гаммы
+                const noteIndex = Math.floor(Math.random() * scale.length);
+                const frequency = scale[noteIndex];
+                
+                // Длительность ноты
+                const durationIndex = i % rhythm.length;
+                const noteDuration = (60 / tempo) * rhythm[durationIndex];
+                
+                // Громкость
+                const volume = 0.2 + Math.random() * 0.3;
+                
+                // Тип волны в зависимости от стиля
+                let waveType = 'sine';
+                if (currentStyle === 'electronic') waveType = ['sawtooth', 'square', 'triangle'][Math.floor(Math.random() * 3)];
+                else if (currentStyle === 'techno') waveType = 'square';
+                else if (currentStyle === 'jazz') waveType = ['sine', 'triangle'][Math.floor(Math.random() * 2)];
+                
+                melodyNotes.push({
+                    frequency,
+                    duration: noteDuration,
+                    volume,
+                    waveType,
+                    startTime: i * noteDuration
+                });
             }
-
-            chord.forEach(freq => {
-                const oscillator = audioContext.createOscillator();
-                const gainNode = audioContext.createGain();
-
-                oscillator.type = ['sine', 'square', 'triangle', 'sawtooth'][Math.floor(Math.random() * 4)]; // Случайный тип волны
-                oscillator.frequency.setValueAtTime(freq, audioContext.currentTime); // Частота ноты
-                gainNode.gain.setValueAtTime(0.2, audioContext.currentTime); // Громкость
-
-                oscillator.connect(gainNode);
-                gainNode.connect(audioContext.destination);
-
-                oscillator.start();
-                oscillator.stop(audioContext.currentTime + 1 + Math.random() * 1); // Случайная длительность (1-2 секунды)
-            });
+            
+            // Добавляем аккорды для некоторых стилей
+            if (currentStyle === 'classical' || currentStyle === 'jazz') {
+                for (let i = 0; i < melodyNotes.length; i += 4) {
+                    if (i + 2 < melodyNotes.length) {
+                        melodyNotes[i].isChord = true;
+                        melodyNotes[i].chordNotes = [
+                            scale[(Math.floor(Math.random() * scale.length) + 2) % scale.length],
+                            scale[(Math.floor(Math.random() * scale.length) + 4) % scale.length]
+                        ];
+                    }
+                }
+            }
+            
+            updateMusicInfo();
+            return melodyNotes;
         }
-
-        // Функция для воспроизведения случайного эффекта (например, "пинг")
-        function playRandomEffect(audioContext) {
+        
+        // Воспроизведение мелодии
+        function playMelody() {
+            if (!audioContext || !currentMelody || isPlaying) return;
+            
+            isPlaying = true;
+            melodyStartTime = audioContext.currentTime;
+            nextNoteTime = melodyStartTime;
+            noteIndex = 0;
+            
+            scheduleNotes();
+        }
+        
+        function scheduleNotes() {
+            if (!isPlaying || !audioContext) return;
+            
+            const currentTime = audioContext.currentTime;
+            
+            while (nextNoteTime < currentTime + 0.1 && noteIndex < currentMelody.length) {
+                const note = currentMelody[noteIndex];
+                const noteTime = nextNoteTime;
+                
+                // Воспроизведение основной ноты
+                playNote(note.frequency, note.duration, note.waveType, note.volume, noteTime);
+                
+                // Воспроизведение аккордов
+                if (note.isChord && note.chordNotes) {
+                    note.chordNotes.forEach(chordFreq => {
+                        playNote(chordFreq, note.duration * 0.8, note.waveType, note.volume * 0.7, noteTime);
+                    });
+                }
+                
+                // Добавление баса для техно и электронной музыки
+                if (currentStyle === 'techno' && noteIndex % 2 === 0) {
+                    playNote(note.frequency * 0.5, note.duration, 'square', note.volume * 0.5, noteTime);
+                }
+                
+                // Создание фигуры в такт музыке
+                setTimeout(() => {
+                    if (isPlaying) {
+                        createMusicShape(note);
+                    }
+                }, (noteTime - audioContext.currentTime) * 1000);
+                
+                nextNoteTime += note.duration;
+                noteIndex++;
+                
+                // Циклическое воспроизведение
+                if (noteIndex >= currentMelody.length) {
+                    noteIndex = 0;
+                }
+            }
+            
+            if (isPlaying) {
+                requestAnimationFrame(scheduleNotes);
+            }
+        }
+        
+        function playNote(frequency, duration, waveType, volume, startTime) {
+            if (!audioContext) return;
+            
             const oscillator = audioContext.createOscillator();
             const gainNode = audioContext.createGain();
-
-            oscillator.type = 'square'; // Тип волны
-            oscillator.frequency.setValueAtTime(1000, audioContext.currentTime); // Начальная частота
-            oscillator.frequency.exponentialRampToValueAtTime(100, audioContext.currentTime + 0.2); // Эффект снижения частоты
-            gainNode.gain.setValueAtTime(0.5, audioContext.currentTime); // Громкость
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2); // Эффект затухания
-
+            
+            oscillator.type = waveType;
+            oscillator.frequency.setValueAtTime(frequency, startTime);
+            
+            // Эффекты в зависимости от стиля
+            if (currentStyle === 'ambient') {
+                oscillator.frequency.exponentialRampToValueAtTime(frequency * 0.9, startTime + duration);
+            }
+            
+            gainNode.gain.setValueAtTime(0, startTime);
+            gainNode.gain.linearRampToValueAtTime(volume, startTime + 0.05);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+            
             oscillator.connect(gainNode);
             gainNode.connect(audioContext.destination);
-
-            oscillator.start();
-            oscillator.stop(audioContext.currentTime + 0.3); // Длительность эффекта
+            
+            oscillator.start(startTime);
+            oscillator.stop(startTime + duration);
         }
-
-        function generateShape() {
-            const shapeType = shapes[Math.floor(Math.random() * shapes.length)];
+        
+        function stopMelody() {
+            isPlaying = false;
+        }
+        
+        function updateMusicInfo() {
+            musicInfo.textContent = `Темп: ${tempo} | Гамма: ${currentScale} | Стиль: ${currentStyle}`;
+        }
+        
+        // Создание фигур в такт музыке
+        function createMusicShape(note) {
+            const shapeTypesByStyle = {
+                'ambient': ['circle', 'spiral', 'wave'],
+                'electronic': ['hexagon', 'rect', 'star'],
+                'classical': ['mandala', 'snowflake', 'triangle'],
+                'jazz': ['koch_curve', 'fractal_tree', 'infinity'],
+                'techno': ['galaxy', 'lorenz', 'julia'],
+                'random': shapeTypes
+            };
+            
+            const availableShapes = shapeTypesByStyle[currentStyle] || shapeTypes;
+            const shapeType = availableShapes[Math.floor(Math.random() * availableShapes.length)];
             const color = colors[Math.floor(Math.random() * colors.length)];
-
+            
+            // Размер фигуры зависит от громкости
+            const sizeMultiplier = note.volume * 2;
+            
             switch(shapeType) {
-                case 'line':
-                    const x1 = Math.random() * 1280;
-                    const y1 = Math.random() * 720;
-                    const x2 = Math.random() * 1280;
-                    const y2 = Math.random() * 720;
-                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                    line.setAttribute('x1', x1);
-                    line.setAttribute('y1', y1);
-                    line.setAttribute('x2', x2);
-                    line.setAttribute('y2', y2);
-                    line.setAttribute('stroke', color);
-                    line.setAttribute('stroke-width', Math.random() * 10 + 1);
-                    line.style.animation = 'growLine 1s forwards';
-                    canvas.appendChild(line);
-                    break;
-                case 'circle':
-                    const cx = Math.random() * 1280;
-                    const cy = Math.random() * 720;
-                    const r = 35;
-                    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-                    circle.setAttribute('cx', cx);
-                    circle.setAttribute('cy', cy);
-                    circle.setAttribute('r', r);
-                    circle.setAttribute('fill', color);
-                    circle.style.animation = 'growCircle 1s forwards';
-                    canvas.appendChild(circle);
-                    break;
-                case 'rect':
-                    const rx = Math.random() * 1280;
-                    const ry = Math.random() * 720;
-                    const w = Math.random() * 80 + 20;
-                    const h = Math.random() * 80 + 20;
-                    const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-                    rect.setAttribute('x', rx);
-                    rect.setAttribute('y', ry);
-                    rect.setAttribute('width', w);
-                    rect.setAttribute('height', h);
-                    rect.setAttribute('fill', color);
-                    rect.style.animation = 'growRect 1s forwards';
-                    canvas.appendChild(rect);
-                    break;
+                case 'circle': createMusicCircle(color, sizeMultiplier); break;
+                case 'spiral': createMusicSpiral(color, sizeMultiplier); break;
+                case 'wave': createWave(color, sizeMultiplier); break;
+                case 'hexagon': createHexagon(color); break;
+                case 'rect': createRectangle(color); break;
+                case 'star': createStar(color); break;
+                case 'mandala': createMandala(color); break;
+                case 'snowflake': createSnowflake(color); break;
+                case 'triangle': createTriangle(color); break;
+                case 'koch_curve': createKochCurve(color); break;
+                case 'fractal_tree': createFractalTree(color); break;
+                case 'infinity': createInfinity(color); break;
+                case 'galaxy': createGalaxy(color); break;
+                case 'lorenz': createLorenz(color); break;
+                case 'julia': createJuliaSet(color); break;
+                default: createCircle(color);
             }
-
-            // Воспроизводим случайный звук при создании фигуры
-            playRandomSound();
+            
+            shapeCount++;
         }
-
-        setInterval(generateShape, 1000); // Вызываем функцию каждую секунду
+        
+        // Специальные музыкальные фигуры
+        function createMusicCircle(color, sizeMultiplier) {
+            const x = Math.random() * 1280;
+            const y = Math.random() * 720;
+            const r = 20 * sizeMultiplier;
+            
+            const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            circle.setAttribute('cx', x);
+            circle.setAttribute('cy', y);
+            circle.setAttribute('r', '0');
+            circle.setAttribute('fill', color);
+            circle.setAttribute('opacity', '0');
+            circle.style.setProperty('--target-radius', r);
+            circle.style.animation = 'growCircle 0.5s ease-out forwards, pulse 1s infinite';
+            
+            canvas.appendChild(circle);
+            setTimeout(() => circle.remove(), 3000);
+        }
+        
+        function createMusicSpiral(color, sizeMultiplier) {
+            const x = Math.random() * 1000 + 140;
+            const y = Math.random() * 520 + 100;
+            const coils = 2 + Math.floor(sizeMultiplier);
+            
+            let path = `M ${x},${y}`;
+            for (let i = 0; i < 360 * coils; i++) {
+                const angle = (i * Math.PI) / 180;
+                const r = 30 * sizeMultiplier * (i / (360 * coils));
+                path += ` L ${x + r * Math.cos(angle)},${y + r * Math.sin(angle)}`;
+            }
+            
+            const spiral = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            spiral.setAttribute('d', path);
+            spiral.setAttribute('fill', 'none');
+            spiral.setAttribute('stroke', color);
+            spiral.setAttribute('stroke-width', '2');
+            spiral.classList.add('spiral-path');
+            
+            canvas.appendChild(spiral);
+            setTimeout(() => spiral.remove(), 4000);
+        }
+        
+        function createWave(color, sizeMultiplier) {
+            const x = Math.random() * 800 + 240;
+            const y = Math.random() * 520 + 100;
+            const amplitude = 30 * sizeMultiplier;
+            const wavelength = 50;
+            
+            let path = `M ${x},${y}`;
+            for (let i = 0; i < 200; i++) {
+                const waveX = x + i;
+                const waveY = y + Math.sin(i / wavelength) * amplitude;
+                path += ` L ${waveX},${waveY}`;
+            }
+            
+            const wave = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            wave.setAttribute('d', path);
+            wave.setAttribute('fill', 'none');
+            wave.setAttribute('stroke', color);
+            wave.setAttribute('stroke-width', '2');
+            wave.style.animation = 'growLine 2s ease-out forwards';
+            
+            canvas.appendChild(wave);
+            setTimeout(() => wave.remove(), 4000);
+        }
+        
+        function createInfinity(color) {
+            const x = Math.random() * 1000 + 140;
+            const y = Math.random() * 520 + 100;
+            const size = 40;
+            
+            let path = `M ${x - size},${y}`;
+            for (let t = 0; t <= Math.PI * 2; t += 0.1) {
+                const px = size * Math.sin(t);
+                const py = size * Math.sin(t) * Math.cos(t);
+                path += ` L ${x + px},${y + py}`;
+            }
+            
+            const infinity = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            infinity.setAttribute('d', path);
+            infinity.setAttribute('fill', 'none');
+            infinity.setAttribute('stroke', color);
+            infinity.setAttribute('stroke-width', '2');
+            infinity.style.animation = 'growLine 2s ease-out forwards, rotateShape 10s linear infinite';
+            
+            canvas.appendChild(infinity);
+            setTimeout(() => infinity.remove(), 5000);
+        }
+        
+        function createHeart(color) {
+            const x = Math.random() * 1000 + 140;
+            const y = Math.random() * 520 + 100;
+            const size = 30;
+            
+            let path = `M ${x},${y}`;
+            for (let t = 0; t <= Math.PI * 2; t += 0.1) {
+                const px = 16 * Math.pow(Math.sin(t), 3);
+                const py = 13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t);
+                path += ` L ${x + px * size/20},${y - py * size/20}`;
+            }
+            path += ' Z';
+            
+            const heart = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            heart.setAttribute('d', path);
+            heart.setAttribute('fill', color);
+            heart.setAttribute('opacity', '0.7');
+            heart.style.animation = 'growCircle 1s ease-out forwards, pulse 2s infinite';
+            
+            canvas.appendChild(heart);
+            setTimeout(() => heart.remove(), 5000);
+        }
+        
+        function createFlower(color) {
+            const x = Math.random() * 1000 + 140;
+            const y = Math.random() * 520 + 100;
+            const petals = 8;
+            const size = 40;
+            
+            let path = '';
+            for (let i = 0; i < petals; i++) {
+                const angle = (i * 2 * Math.PI) / petals;
+                const x1 = x + size * Math.cos(angle);
+                const y1 = y + size * Math.sin(angle);
+                const x2 = x + size * 0.5 * Math.cos(angle + Math.PI/petals);
+                const y2 = y + size * 0.5 * Math.sin(angle + Math.PI/petals);
+                const x3 = x + size * 0.5 * Math.cos(angle - Math.PI/petals);
+                const y3 = y + size * 0.5 * Math.sin(angle - Math.PI/petals);
+                
+                if (i === 0) path += `M ${x1},${y1}`;
+                else path += ` L ${x1},${y1}`;
+                path += ` Q ${x2},${y2} ${x},${y}`;
+                path += ` Q ${x3},${y3} ${x1},${y1}`;
+            }
+            path += ' Z';
+            
+            const flower = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            flower.setAttribute('d', path);
+            flower.setAttribute('fill', color);
+            flower.setAttribute('opacity', '0.7');
+            flower.style.animation = 'fractalGrow 2s ease-out forwards';
+            
+            canvas.appendChild(flower);
+            setTimeout(() => flower.remove(), 6000);
+        }
+        
+        function createGalaxy(color) {
+            const x = Math.random() * 1000 + 140;
+            const y = Math.random() * 520 + 100;
+            const arms = 3 + Math.floor(Math.random() * 3);
+            const stars = 100;
+            
+            let paths = '';
+            for (let i = 0; i < stars; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const distance = Math.random() * 100;
+                const armAngle = (i % arms) * (2 * Math.PI / arms);
+                const spiralDistance = distance * 0.5;
+                
+                const starX = x + (distance + spiralDistance) * Math.cos(angle + armAngle);
+                const starY = y + (distance + spiralDistance) * Math.sin(angle + armAngle);
+                const starSize = 1 + Math.random() * 3;
+                
+                paths += `<circle cx="${starX}" cy="${starY}" r="${starSize}" fill="${color}" opacity="${0.3 + Math.random() * 0.5}" />`;
+            }
+            
+            const galaxy = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            galaxy.innerHTML = paths;
+            galaxy.style.animation = 'fractalGrow 3s ease-out forwards';
+            
+            canvas.appendChild(galaxy);
+            setTimeout(() => galaxy.remove(), 8000);
+        }
+        
+        // Существующие функции создания фигур (сокращены для краткости)
+        function createLine(color) {
+            const x1 = Math.random() * 1280;
+            const y1 = Math.random() * 720;
+            const x2 = x1 + (Math.random() * 200 - 100);
+            const y2 = y1 + (Math.random() * 200 - 100);
+            
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line.setAttribute('x1', x1);
+            line.setAttribute('y1', y1);
+            line.setAttribute('x2', x2);
+            line.setAttribute('y2', y2);
+            line.setAttribute('stroke', color);
+            line.setAttribute('stroke-width', Math.random() * 5 + 1);
+            line.style.strokeDasharray = '1000';
+            line.style.strokeDashoffset = '1000';
+            line.style.animation = 'growLine 2s ease-out forwards';
+            
+            canvas.appendChild(line);
+            setTimeout(() => line.remove(), 5000);
+        }
+        
+        function createCircle(color) {
+            const cx = Math.random() * 1280;
+            const cy = Math.random() * 720;
+            const r = Math.random() * 50 + 20;
+            
+            const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            circle.setAttribute('cx', cx);
+            circle.setAttribute('cy', cy);
+            circle.setAttribute('r', '0');
+            circle.setAttribute('fill', color);
+            circle.setAttribute('opacity', '0');
+            circle.style.setProperty('--target-radius', r);
+            circle.style.animation = 'growCircle 1.5s ease-out forwards';
+            
+            canvas.appendChild(circle);
+            setTimeout(() => circle.remove(), 6000);
+        }
+        
+        function createRectangle(color) {
+            const x = Math.random() * 1200;
+            const y = Math.random() * 640;
+            const w = Math.random() * 100 + 30;
+            const h = Math.random() * 100 + 30;
+            
+            const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            rect.setAttribute('x', x);
+            rect.setAttribute('y', y);
+            rect.setAttribute('width', '0');
+            rect.setAttribute('height', '0');
+            rect.setAttribute('fill', color);
+            rect.setAttribute('opacity', '0');
+            rect.style.setProperty('--target-width', w);
+            rect.style.setProperty('--target-height', h);
+            rect.style.animation = 'growRect 1.5s ease-out forwards';
+            
+            canvas.appendChild(rect);
+            setTimeout(() => rect.remove(), 6000);
+        }
+        
+        function createTriangle(color) {
+            const x = Math.random() * 1200;
+            const y = Math.random() * 640;
+            const size = Math.random() * 80 + 30;
+            
+            const points = `${x},${y} ${x+size},${y+size} ${x-size/2},${y+size}`;
+            
+            const triangle = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+            triangle.setAttribute('points', points);
+            triangle.setAttribute('fill', color);
+            triangle.setAttribute('opacity', '0');
+            triangle.style.animation = 'growRect 1.5s ease-out forwards, pulse 2s infinite';
+            
+            canvas.appendChild(triangle);
+            setTimeout(() => triangle.remove(), 6000);
+        }
+        
+        function createStar(color) {
+            const x = Math.random() * 1200;
+            const y = Math.random() * 640;
+            const size = Math.random() * 40 + 20;
+            const spikes = 5 + Math.floor(Math.random() * 3);
+            
+            let points = '';
+            for (let i = 0; i < spikes * 2; i++) {
+                const radius = i % 2 === 0 ? size : size / 2;
+                const angle = (i * Math.PI) / spikes;
+                points += `${x + radius * Math.sin(angle)},${y - radius * Math.cos(angle)} `;
+            }
+            
+            const star = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+            star.setAttribute('points', points);
+            star.setAttribute('fill', color);
+            star.setAttribute('opacity', '0.8');
+            star.style.animation = 'fractalGrow 2s ease-out forwards, rotateShape 10s linear infinite';
+            
+            canvas.appendChild(star);
+            setTimeout(() => star.remove(), 7000);
+        }
+        
+        function createHexagon(color) {
+            const x = Math.random() * 1200;
+            const y = Math.random() * 640;
+            const size = Math.random() * 50 + 20;
+            
+            let points = '';
+            for (let i = 0; i < 6; i++) {
+                const angle = (i * Math.PI) / 3;
+                points += `${x + size * Math.sin(angle)},${y - size * Math.cos(angle)} `;
+            }
+            
+            const hexagon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+            hexagon.setAttribute('points', points);
+            hexagon.setAttribute('fill', color);
+            hexagon.setAttribute('opacity', '0.7');
+            hexagon.style.animation = 'fractalGrow 2s ease-out forwards';
+            
+            canvas.appendChild(hexagon);
+            setTimeout(() => hexagon.remove(), 6000);
+        }
+        
+        function createSpiral(color) {
+            const x = Math.random() * 1000 + 140;
+            const y = Math.random() * 520 + 100;
+            const coils = 3 + Math.floor(Math.random() * 3);
+            const radius = 50;
+            
+            let path = `M ${x},${y}`;
+            for (let i = 0; i < 360 * coils; i++) {
+                const angle = (i * Math.PI) / 180;
+                const r = radius * (i / (360 * coils));
+                path += ` L ${x + r * Math.cos(angle)},${y + r * Math.sin(angle)}`;
+            }
+            
+            const spiral = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            spiral.setAttribute('d', path);
+            spiral.setAttribute('fill', 'none');
+            spiral.setAttribute('stroke', color);
+            spiral.setAttribute('stroke-width', '2');
+            spiral.classList.add('spiral-path');
+            
+            canvas.appendChild(spiral);
+            setTimeout(() => spiral.remove(), 8000);
+        }
+        
+        function createMandala(color) {
+            const x = Math.random() * 1000 + 140;
+            const y = Math.random() * 520 + 100;
+            const layers = 3 + Math.floor(Math.random() * 4);
+            const radius = 40;
+            
+            let path = '';
+            for (let layer = 0; layer < layers; layer++) {
+                const layerRadius = radius * (layer + 1);
+                const petals = 6 + layer * 2;
+                
+                for (let i = 0; i < petals; i++) {
+                    const angle1 = (i * 2 * Math.PI) / petals;
+                    const angle2 = ((i + 0.5) * 2 * Math.PI) / petals;
+                    
+                    const x1 = x + layerRadius * Math.cos(angle1);
+                    const y1 = y + layerRadius * Math.sin(angle1);
+                    const x2 = x + layerRadius * 0.7 * Math.cos(angle2);
+                    const y2 = y + layerRadius * 0.7 * Math.sin(angle2);
+                    
+                    if (i === 0) {
+                        path += `M ${x1},${y1}`;
+                    } else {
+                        path += ` L ${x1},${y1}`;
+                    }
+                    path += ` L ${x2},${y2}`;
+                }
+                path += ' Z';
+            }
+            
+            const mandala = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            mandala.setAttribute('d', path);
+            mandala.setAttribute('fill', color);
+            mandala.setAttribute('opacity', '0.6');
+            mandala.classList.add('fractal-path');
+            
+            canvas.appendChild(mandala);
+            setTimeout(() => mandala.remove(), 10000);
+        }
+        
+        function createSnowflake(color) {
+            const x = Math.random() * 1000 + 140;
+            const y = Math.random() * 520 + 100;
+            const size = Math.random() * 60 + 30;
+            
+            function kochSide(x1, y1, x2, y2, depth, maxDepth) {
+                if (depth === maxDepth) {
+                    return `L ${x2},${y2}`;
+                }
+                
+                const dx = x2 - x1;
+                const dy = y2 - y1;
+                
+                const x3 = x1 + dx / 3;
+                const y3 = y1 + dy / 3;
+                
+                const x4 = x1 + 2 * dx / 3;
+                const y4 = y1 + 2 * dy / 3;
+                
+                const angle = Math.PI / 3;
+                const x5 = x3 + (x4 - x3) * Math.cos(angle) - (y4 - y3) * Math.sin(angle);
+                const y5 = y3 + (x4 - x3) * Math.sin(angle) + (y4 - y3) * Math.cos(angle);
+                
+                return kochSide(x1, y1, x3, y3, depth + 1, maxDepth) + ' ' +
+                       kochSide(x3, y3, x5, y5, depth + 1, maxDepth) + ' ' +
+                       kochSide(x5, y5, x4, y4, depth + 1, maxDepth) + ' ' +
+                       kochSide(x4, y4, x2, y2, depth + 1, maxDepth);
+            }
+            
+            const height = size * Math.sqrt(3) / 2;
+            const depth = 2 + Math.floor(Math.random() * 3);
+            
+            let path = `M ${x},${y - height/2}`;
+            path += ' ' + kochSide(x, y - height/2, x + size/2, y + height/2, 0, depth);
+            path += ' ' + kochSide(x + size/2, y + height/2, x - size/2, y + height/2, 0, depth);
+            path += ' ' + kochSide(x - size/2, y + height/2, x, y - height/2, 0, depth);
+            
+            const snowflake = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            snowflake.setAttribute('d', path);
+            snowflake.setAttribute('fill', 'none');
+            snowflake.setAttribute('stroke', color);
+            snowflake.setAttribute('stroke-width', '1.5');
+            snowflake.style.animation = 'fractalGrow 3s ease-out forwards';
+            
+            canvas.appendChild(snowflake);
+            setTimeout(() => snowflake.remove(), 10000);
+        }
+        
+        function createFractalTree(color) {
+            const x = Math.random() * 1000 + 140;
+            const y = Math.random() * 520 + 100;
+            const trunkHeight = 60 + Math.random() * 40;
+            
+            function drawBranch(startX, startY, length, angle, depth, maxDepth) {
+                if (depth > maxDepth) return '';
+                
+                const endX = startX + length * Math.cos(angle);
+                const endY = startY - length * Math.sin(angle);
+                
+                let path = `M ${startX},${startY} L ${endX},${endY}`;
+                
+                if (depth < maxDepth) {
+                    const newLength = length * (0.6 + Math.random() * 0.2);
+                    const angleVariation = Math.PI / 6;
+                    
+                    path += ' ' + drawBranch(endX, endY, newLength, angle - angleVariation, depth + 1, maxDepth);
+                    path += ' ' + drawBranch(endX, endY, newLength, angle + angleVariation, depth + 1, maxDepth);
+                    
+                    if (Math.random() > 0.5) {
+                        path += ' ' + drawBranch(endX, endY, newLength * 0.7, angle, depth + 1, maxDepth);
+                    }
+                }
+                
+                return path;
+            }
+            
+            const depth = 3 + Math.floor(Math.random() * 4);
+            let path = drawBranch(x, y + trunkHeight, trunkHeight, -Math.PI/2, 0, depth);
+            
+            const tree = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            tree.setAttribute('d', path);
+            tree.setAttribute('fill', 'none');
+            tree.setAttribute('stroke', color);
+            tree.setAttribute('stroke-width', '2');
+            tree.style.animation = 'spiralGrow 3s ease-out forwards';
+            
+            canvas.appendChild(tree);
+            setTimeout(() => tree.remove(), 10000);
+        }
+        
+        function createKochCurve(color) {
+            const x = Math.random() * 1000 + 140;
+            const y = Math.random() * 520 + 100;
+            const length = 100 + Math.random() * 100;
+            
+            function koch(x1, y1, x2, y2, depth, maxDepth) {
+                if (depth === maxDepth) {
+                    return `L ${x2},${y2}`;
+                }
+                
+                const dx = x2 - x1;
+                const dy = y2 - y1;
+                
+                const x3 = x1 + dx / 3;
+                const y3 = y1 + dy / 3;
+                
+                const x4 = x1 + 2 * dx / 3;
+                const y4 = y1 + 2 * dy / 3;
+                
+                const angle = Math.PI / 3;
+                const x5 = x3 + (x4 - x3) * Math.cos(angle) - (y4 - y3) * Math.sin(angle);
+                const y5 = y3 + (x4 - x3) * Math.sin(angle) + (y4 - y3) * Math.cos(angle);
+                
+                return koch(x1, y1, x3, y3, depth + 1, maxDepth) + ' ' +
+                       koch(x3, y3, x5, y5, depth + 1, maxDepth) + ' ' +
+                       koch(x5, y5, x4, y4, depth + 1, maxDepth) + ' ' +
+                       koch(x4, y4, x2, y2, depth + 1, maxDepth);
+            }
+            
+            const depth = 2 + Math.floor(Math.random() * 4);
+            let path = `M ${x},${y}`;
+            path += ' ' + koch(x, y, x + length, y, 0, depth);
+            
+            const kochCurve = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            kochCurve.setAttribute('d', path);
+            kochCurve.setAttribute('fill', 'none');
+            kochCurve.setAttribute('stroke', color);
+            kochCurve.setAttribute('stroke-width', '1.5');
+            kochCurve.style.animation = 'spiralGrow 3s ease-out forwards';
+            
+            canvas.appendChild(kochCurve);
+            setTimeout(() => kochCurve.remove(), 10000);
+        }
+        
+        function createSierpinski(color) {
+            const x = Math.random() * 1000 + 140;
+            const y = Math.random() * 520 + 100;
+            const size = 80 + Math.random() * 80;
+            
+            function sierpinski(x1, y1, x2, y2, x3, y3, depth, maxDepth) {
+                if (depth === maxDepth) {
+                    return `<polygon points="${x1},${y1} ${x2},${y2} ${x3},${y3}" fill="${color}" opacity="0.7" style="animation: growRect 1s ease-out forwards" />`;
+                }
+                
+                const x12 = (x1 + x2) / 2;
+                const y12 = (y1 + y2) / 2;
+                const x23 = (x2 + x3) / 2;
+                const y23 = (y2 + y3) / 2;
+                const x31 = (x3 + x1) / 2;
+                const y31 = (y3 + y1) / 2;
+                
+                return sierpinski(x1, y1, x12, y12, x31, y31, depth + 1, maxDepth) +
+                       sierpinski(x12, y12, x2, y2, x23, y23, depth + 1, maxDepth) +
+                       sierpinski(x31, y31, x23, y23, x3, y3, depth + 1, maxDepth);
+            }
+            
+            const height = size * Math.sqrt(3) / 2;
+            const depth = 2 + Math.floor(Math.random() * 4);
+            
+            const triangles = sierpinski(
+                x, y - height/2,
+                x + size/2, y + height/2,
+                x - size/2, y + height/2,
+                0, depth
+            );
+            
+            const container = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            container.innerHTML = triangles;
+            container.style.animation = 'fractalGrow 2s ease-out forwards';
+            
+            canvas.appendChild(container);
+            setTimeout(() => container.remove(), 10000);
+        }
+        
+        function createLorenz(color) {
+            const x = Math.random() * 1000 + 140;
+            const y = Math.random() * 520 + 100;
+            const scale = 20;
+            
+            const sigma = 10;
+            const rho = 28;
+            const beta = 8/3;
+            const dt = 0.01;
+            
+            let lx = 0.1, ly = 0, lz = 0;
+            let path = `M ${x + lx * scale},${y + lz * scale}`;
+            
+            for (let i = 0; i < 500; i++) {
+                const dx = sigma * (ly - lx);
+                const dy = lx * (rho - lz) - ly;
+                const dz = lx * ly - beta * lz;
+                
+                lx += dx * dt;
+                ly += dy * dt;
+                lz += dz * dt;
+                
+                path += ` L ${x + lx * scale},${y + lz * scale}`;
+            }
+            
+            const lorenz = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            lorenz.setAttribute('d', path);
+            lorenz.setAttribute('fill', 'none');
+            lorenz.setAttribute('stroke', color);
+            lorenz.setAttribute('stroke-width', '1');
+            lorenz.classList.add('spiral-path');
+            
+            canvas.appendChild(lorenz);
+            setTimeout(() => lorenz.remove(), 12000);
+        }
+        
+        function createJuliaSet(color) {
+            const x = Math.random() * 1000 + 140;
+            const y = Math.random() * 520 + 100;
+            const size = 100;
+            const iterations = 20;
+            
+            const cRe = Math.random() * 2 - 1;
+            const cIm = Math.random() * 2 - 1;
+            
+            let path = '';
+            for (let px = -size; px <= size; px += 4) {
+                for (let py = -size; py <= size; py += 4) {
+                    let zx = px / size * 1.5;
+                    let zy = py / size * 1.5;
+                    
+                    let i = 0;
+                    while (i < iterations) {
+                        const x2 = zx * zx - zy * zy + cRe;
+                        const y2 = 2 * zx * zy + cIm;
+                        zx = x2;
+                        zy = y2;
+                        
+                        if (zx * zx + zy * zy > 4) break;
+                        i++;
+                    }
+                    
+                    if (i < iterations) {
+                        const dotSize = 1 + (i / iterations) * 3;
+                        path += `<circle cx="${x + px}" cy="${y + py}" r="${dotSize}" fill="${color}" opacity="${0.1 + i/iterations * 0.4}" />`;
+                    }
+                }
+            }
+            
+            const julia = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            julia.innerHTML = path;
+            julia.style.animation = 'fractalGrow 3s ease-out forwards';
+            
+            canvas.appendChild(julia);
+            setTimeout(() => julia.remove(), 15000);
+        }
+        
+        function createMandelbrot(color) {
+            const x = Math.random() * 1000 + 140;
+            const y = Math.random() * 520 + 100;
+            const size = 80;
+            const iterations = 30;
+            
+            let path = '';
+            for (let px = -size; px <= size; px += 3) {
+                for (let py = -size; py <= size; py += 3) {
+                    const cx = px / size * 2;
+                    const cy = py / size * 2;
+                    
+                    let zx = 0, zy = 0;
+                    let i = 0;
+                    while (i < iterations) {
+                        const x2 = zx * zx - zy * zy + cx;
+                        const y2 = 2 * zx * zy + cy;
+                        zx = x2;
+                        zy = y2;
+                        
+                        if (zx * zx + zy * zy > 4) break;
+                        i++;
+                    }
+                    
+                    if (i === iterations) {
+                        const dotSize = 2;
+                        path += `<circle cx="${x + px}" cy="${y + py}" r="${dotSize}" fill="${color}" opacity="0.7" />`;
+                    }
+                }
+            }
+            
+            const mandelbrot = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            mandelbrot.innerHTML = path;
+            mandelbrot.style.animation = 'fractalGrow 4s ease-out forwards';
+            
+            canvas.appendChild(mandelbrot);
+            setTimeout(() => mandelbrot.remove(), 15000);
+        }
+        
+        // Очистка старых фигур
+        function cleanup() {
+            const maxShapes = 50;
+            const shapes = canvas.children;
+            if (shapes.length > maxShapes) {
+                for (let i = 0; i < shapes.length - maxShapes; i++) {
+                    if (shapes[i]) {
+                        shapes[i].remove();
+                    }
+                }
+            }
+        }
+        
+        // Визуализатор аудио
+        function drawVisualizer() {
+            visualizerCtx.clearRect(0, 0, visualizerCanvas.width, visualizerCanvas.height);
+            
+            if (!isPlaying) return;
+            
+            const time = audioContext.currentTime - melodyStartTime;
+            const beat = (time * tempo / 60) % 1;
+            
+            // Рисуем волну
+            visualizerCtx.strokeStyle = '#00ff00';
+            visualizerCtx.lineWidth = 2;
+            visualizerCtx.beginPath();
+            
+            for (let x = 0; x < visualizerCanvas.width; x++) {
+                const t = (x / visualizerCanvas.width) * 2 * Math.PI + time * 2;
+                const y = visualizerCanvas.height / 2 + 
+                         Math.sin(t * 2) * 15 * Math.sin(beat * Math.PI) +
+                         Math.sin(t * 3) * 10;
+                
+                if (x === 0) {
+                    visualizerCtx.moveTo(x, y);
+                } else {
+                    visualizerCtx.lineTo(x, y);
+                }
+            }
+            
+            visualizerCtx.stroke();
+            
+            // Рисуем точки на битах
+            const beatX = beat * visualizerCanvas.width;
+            visualizerCtx.fillStyle = '#ff0000';
+            visualizerCtx.beginPath();
+            visualizerCtx.arc(beatX, visualizerCanvas.height / 2, 4, 0, Math.PI * 2);
+            visualizerCtx.fill();
+            
+            requestAnimationFrame(drawVisualizer);
+        }
+        
+        // Основной цикл
+        function mainLoop() {
+            updateStats();
+            cleanup();
+            requestAnimationFrame(mainLoop);
+        }
+        
+        // Запуск генерации фигур
+        function startGeneration() {
+            // Быстрые простые фигуры
+            setInterval(() => {
+                if (Math.random() > 0.3) {
+                    const simpleTypes = ['line', 'circle', 'rect', 'triangle', 'star', 'hexagon', 'heart', 'flower'];
+                    const type = simpleTypes[Math.floor(Math.random() * simpleTypes.length)];
+                    const color = colors[Math.floor(Math.random() * colors.length)];
+                    
+                    switch(type) {
+                        case 'line': createLine(color); break;
+                        case 'circle': createCircle(color); break;
+                        case 'rect': createRectangle(color); break;
+                        case 'triangle': createTriangle(color); break;
+                        case 'star': createStar(color); break;
+                        case 'hexagon': createHexagon(color); break;
+                        case 'heart': createHeart(color); break;
+                        case 'flower': createFlower(color); break;
+                    }
+                    shapeCount++;
+                }
+            }, 300);
+            
+            // Средние по сложности фигуры
+            setInterval(() => {
+                if (Math.random() > 0.5) {
+                    const mediumTypes = ['spiral', 'mandala', 'snowflake', 'koch_curve', 'infinity', 'wave'];
+                    const type = mediumTypes[Math.floor(Math.random() * mediumTypes.length)];
+                    const color = colors[Math.floor(Math.random() * colors.length)];
+                    
+                    switch(type) {
+                        case 'spiral': createSpiral(color); break;
+                        case 'mandala': createMandala(color); break;
+                        case 'snowflake': createSnowflake(color); break;
+                        case 'koch_curve': createKochCurve(color); break;
+                        case 'infinity': createInfinity(color); break;
+                        case 'wave': createWave(color, 1); break;
+                    }
+                    shapeCount++;
+                }
+            }, 1500);
+            
+            // Сложные фракталы
+            setInterval(() => {
+                if (Math.random() > 0.7) {
+                    const complexTypes = ['fractal_tree', 'sierpinski', 'lorenz', 'julia', 'mandelbrot', 'galaxy'];
+                    const type = complexTypes[Math.floor(Math.random() * complexTypes.length)];
+                    const color = colors[Math.floor(Math.random() * colors.length)];
+                    
+                    switch(type) {
+                        case 'fractal_tree': createFractalTree(color); break;
+                        case 'sierpinski': createSierpinski(color); break;
+                        case 'lorenz': createLorenz(color); break;
+                        case 'julia': createJuliaSet(color); break;
+                        case 'mandelbrot': createMandelbrot(color); break;
+                        case 'galaxy': createGalaxy(color); break;
+                    }
+                    shapeCount++;
+                }
+            }, 3000);
+        }
+        
+        // Обработчики кнопок
+        document.getElementById('playMelody').addEventListener('click', () => {
+            if (!currentMelody) {
+                currentMelody = generateMelody();
+            }
+            if (!isPlaying) {
+                playMelody();
+                drawVisualizer();
+            }
+        });
+        
+        document.getElementById('stopMelody').addEventListener('click', () => {
+            stopMelody();
+        });
+        
+        document.getElementById('newMelody').addEventListener('click', () => {
+            stopMelody();
+            currentMelody = generateMelody();
+            if (autoPlay) {
+                setTimeout(() => playMelody(), 500);
+                drawVisualizer();
+            }
+        });
+        
+        document.getElementById('toggleAuto').addEventListener('click', function() {
+            autoPlay = !autoPlay;
+            this.textContent = autoPlay ? '🔁 Авто: ВКЛ' : '🔁 Авто: ВЫКЛ';
+        });
+        
+        // Инициализация
+        initAudio();
+        currentMelody = generateMelody();
+        startGeneration();
+        mainLoop();
+        
+        // Автоматический запуск музыки
+        setTimeout(() => {
+            if (autoPlay && audioContext) {
+                playMelody();
+                drawVisualizer();
+            }
+        }, 1000);
+        
+        // Автоматическая смена мелодии каждые 30 секунд
+        setInterval(() => {
+            if (autoPlay && audioContext) {
+                stopMelody();
+                currentMelody = generateMelody();
+                setTimeout(() => playMelody(), 500);
+            }
+        }, 30000);
+        
+        // Автоматическая перезагрузка каждые 10 минут
+        setTimeout(() => {
+            location.reload();
+        }, 600000);
     </script>
 </body>
 </html>
