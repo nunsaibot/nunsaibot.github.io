@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Tectonik Jaguar Hell | VHS Стиль</title>
+    <title>Jaguar Hell | Облачные сохранения + Туториал</title>
     <style>
         * {
             margin: 0;
@@ -25,7 +25,6 @@
             background: #0a0a1a;
         }
 
-        /* VHS Меню */
         .vhs-overlay {
             position: fixed;
             top: 0;
@@ -54,8 +53,8 @@
             background: rgba(0, 0, 0, 0.85);
             border: 3px solid #ff00ff;
             border-radius: 20px;
-            padding: 40px;
-            min-width: 400px;
+            padding: 25px;
+            min-width: 450px;
             text-align: center;
             backdrop-filter: blur(8px);
             box-shadow: 0 0 30px rgba(255, 0, 255, 0.5), inset 0 0 20px rgba(0, 255, 255, 0.3);
@@ -71,50 +70,68 @@
         }
 
         .vhs-title {
-            font-size: 48px;
+            font-size: 38px;
             font-weight: bold;
             color: #ff00ff;
             text-shadow: 0 0 10px #ff00ff, 0 0 20px #ff00ff, 4px 4px 0 #00ffff;
-            margin-bottom: 30px;
+            margin-bottom: 15px;
             letter-spacing: 4px;
         }
 
         .vhs-input {
             width: 100%;
-            padding: 12px;
-            margin: 15px 0;
+            padding: 10px;
+            margin: 10px 0;
             background: #000;
             border: 2px solid #ff00ff;
             color: #0ff;
-            font-size: 18px;
+            font-size: 16px;
             font-family: monospace;
             text-align: center;
             outline: none;
         }
 
-        .vhs-input:focus {
-            border-color: #0ff;
-            box-shadow: 0 0 10px #0ff;
-        }
-
         .vhs-btn {
             width: 100%;
-            padding: 12px;
-            margin: 10px 0;
+            padding: 10px;
+            margin: 8px 0;
             background: linear-gradient(90deg, #ff00ff, #00ffff);
             border: none;
             color: #000;
-            font-size: 20px;
+            font-size: 18px;
             font-weight: bold;
             font-family: monospace;
             cursor: pointer;
             transition: 0.2s;
             text-transform: uppercase;
+            border-radius: 8px;
         }
 
         .vhs-btn:hover {
             transform: scale(1.02);
             box-shadow: 0 0 15px #ff00ff;
+        }
+
+        .shop-btn {
+            background: linear-gradient(90deg, #ff8800, #ff00ff);
+        }
+
+        .back-btn {
+            background: #333;
+            margin-top: 15px;
+        }
+
+        .coins-display {
+            font-size: 28px;
+            font-weight: bold;
+            color: #ffcc00;
+            text-shadow: 0 0 10px #ffaa00;
+            background: rgba(0,0,0,0.6);
+            padding: 8px 20px;
+            border-radius: 40px;
+            display: inline-block;
+            margin-bottom: 15px;
+            border: 1px solid #ffcc00;
         }
 
         .vhs-stats {
@@ -125,7 +142,7 @@
             background: rgba(0,0,0,0.7);
             border: 1px solid #ff00ff;
             color: #0ff;
-            font-size: 14px;
+            font-size: 13px;
             text-align: left;
         }
 
@@ -134,29 +151,6 @@
             border-bottom: 1px solid rgba(255,0,255,0.3);
         }
 
-        .vhs-settings {
-            margin: 20px 0;
-        }
-
-        .settings-row {
-            margin: 15px 0;
-            color: #0ff;
-            font-size: 18px;
-        }
-
-        input[type="range"] {
-            width: 100%;
-            margin: 10px 0;
-            background: #ff00ff;
-            height: 4px;
-        }
-
-        .back-btn {
-            background: #333;
-            margin-top: 20px;
-        }
-
-        /* Сообщение о смерти */
         .death-panel {
             position: absolute;
             top: 50%;
@@ -175,7 +169,7 @@
 
         .death-text {
             color: #ff1155;
-            font-size: 48px;
+            font-size: 42px;
             font-weight: bold;
             text-shadow: 0 0 20px red;
             margin-bottom: 20px;
@@ -183,73 +177,323 @@
 
         .restart-text {
             color: #0ff;
-            font-size: 24px;
-            animation: blink 1s infinite;
-        }
-
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+            font-size: 20px;
+            margin-top: 10px;
         }
 
         .hidden {
             display: none !important;
         }
         
-        /* HUD поверх канваса */
         #ui {
             position: absolute;
             top: 18px;
             left: 22px;
             color: #0ff;
-            font-size: 26px;
+            font-size: 22px;
             font-weight: bold;
             z-index: 20;
-            text-shadow: 0 0 12px #0ff, 0 0 4px #0ff;
+            text-shadow: 0 0 12px #0ff;
             background: rgba(0, 0, 0, 0.65);
-            padding: 12px 22px;
+            padding: 8px 18px;
             border-radius: 16px;
             backdrop-filter: blur(6px);
             border-left: 4px solid #ff44ff;
             font-family: monospace;
-            letter-spacing: 1px;
             pointer-events: none;
         }
 
         #ui span {
             color: #ff44ff;
-            font-size: 30px;
-            text-shadow: 0 0 10px #ff00aa;
+            font-size: 26px;
         }
         
-        /* Информация о треке */
         #trackInfo {
             position: absolute;
             bottom: 20px;
             left: 20px;
             color: rgba(0, 255, 255, 0.6);
-            font-size: 12px;
+            font-size: 11px;
             font-family: monospace;
             background: rgba(0,0,0,0.5);
-            padding: 5px 10px;
+            padding: 4px 8px;
             border-radius: 8px;
             pointer-events: none;
             z-index: 20;
         }
+
+        .shop-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .shop-tab {
+            padding: 8px 16px;
+            background: rgba(0,0,0,0.7);
+            border: 1px solid #ff00ff;
+            border-radius: 30px;
+            color: #0ff;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .shop-tab.active {
+            background: linear-gradient(90deg, #ff00ff, #00ffff);
+            color: #000;
+            border-color: #00ffff;
+            box-shadow: 0 0 10px #ff00ff;
+        }
+        .shop-tab:hover {
+            transform: scale(1.02);
+            background: rgba(255,0,255,0.3);
+        }
+
+        .shop-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            max-height: 380px;
+            overflow-y: auto;
+            margin: 10px 0;
+            padding: 5px 10px 5px 5px;
+        }
+        
+        .shop-grid::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .shop-grid::-webkit-scrollbar-track {
+            background: #1a1a2e;
+            border-radius: 4px;
+            border: 1px solid #ff00ff;
+        }
+        
+        .shop-grid::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #ff00ff, #00ffff);
+            border-radius: 4px;
+        }
+        
+        .shop-grid::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #ff44ff, #44ffff);
+        }
+
+        .shop-item {
+            background: rgba(0,0,0,0.7);
+            border: 1px solid #ff00ff;
+            border-radius: 12px;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: 0.1s;
+        }
+
+        .shop-item:hover {
+            background: rgba(255,0,255,0.2);
+        }
+
+        .shop-preview {
+            width: 60px;
+            height: 60px;
+            background: #111;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #ff00ff;
+            overflow: hidden;
+        }
+
+        .shop-preview canvas {
+            width: 60px;
+            height: 60px;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+        }
+
+        .shop-info {
+            flex: 1;
+            text-align: left;
+        }
+
+        .shop-name {
+            font-size: 16px;
+            font-weight: bold;
+            color: #0ff;
+        }
+
+        .shop-price {
+            font-size: 14px;
+            color: #ffcc00;
+        }
+
+        .shop-action {
+            min-width: 100px;
+        }
+
+        .shop-action button {
+            padding: 6px 12px;
+            font-size: 14px;
+            margin: 0;
+            background: linear-gradient(90deg, #ff00ff, #00ffff);
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .shop-action button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .vhs-settings {
+            margin: 15px 0;
+        }
+        
+        .settings-row {
+            margin: 12px 0;
+            color: #0ff;
+            font-size: 16px;
+        }
+        
+        input[type="range"] {
+            width: 100%;
+            margin: 8px 0;
+            background: #ff00ff;
+            height: 4px;
+            -webkit-appearance: none;
+        }
+        
+        input[type="range"]:focus {
+            outline: none;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            background: #0ff;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 1px solid #ff00ff;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 300;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .loading-text {
+            color: #0ff;
+            font-size: 24px;
+            font-family: monospace;
+            text-shadow: 0 0 10px #0ff;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid #ff00ff;
+            border-top-color: #0ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .tutorial-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 400;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: monospace;
+        }
+        .tutorial-content {
+            background: #0a0a2a;
+            border: 3px solid #ff00ff;
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            max-width: 500px;
+            animation: glitchPop 0.5s;
+        }
+        @keyframes glitchPop {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .tutorial-text {
+            color: #0ff;
+            font-size: 22px;
+            margin: 30px 0;
+            line-height: 1.4;
+        }
+        .tutorial-btn {
+            background: linear-gradient(90deg, #ff00ff, #00ffff);
+            border: none;
+            padding: 12px 30px;
+            font-size: 20px;
+            font-weight: bold;
+            font-family: monospace;
+            cursor: pointer;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
+<div id="loadingOverlay" class="loading-overlay">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">ЗАГРУЗКА ДАННЫХ...</div>
+</div>
+
+<div id="tutorialModal" class="tutorial-modal" style="display: none;">
+    <div class="tutorial-content">
+        <div class="vhs-title" style="font-size: 28px;">📖 ИНСТРУКЦИЯ</div>
+        <div class="tutorial-text">
+            ДОБЕРИСЬ ДО ФИНИША ИЗБЕГАЯ БАНОК<br><br>
+            🎮 ПЕРЕМЕЩЕНИЕ: <span style="color:#ff00ff;">WASD</span> или <span style="color:#ff00ff;">СТРЕЛКИ</span><br>
+            💰 СОБИРАЙ МОНЕТЫ ДЛЯ ПОКУПКИ СКИНОВ<br>
+            ❤️ УДАЧИ!
+        </div>
+        <button class="tutorial-btn" id="closeTutorialBtn">ОК</button>
+    </div>
+</div>
+
 <div id="ui">
-    💀 ПОПЫТКИ: <span id="deaths">0</span> &nbsp;&nbsp;| ⚡ УРОВЕНЬ: <span id="level">1</span>
+    💀 ПОПЫТКИ: <span id="deaths">0</span> &nbsp;&nbsp;| ⚡ УРОВЕНЬ: <span id="level">1</span> &nbsp;&nbsp;| 💰 МОНЕТ: <span id="gameCoins">0</span>
 </div>
 <div id="trackInfo">🎵 ЗАГРУЗКА МУЗЫКИ...</div>
 
-<div id="vhsMenu" class="vhs-overlay">
+<div id="vhsMenu" class="vhs-overlay" style="display:none;">
     <div class="vhs-menu">
         <div class="vhs-title">⚡ JAGUAR HELL ⚡</div>
+        <div class="coins-display" id="coinsDisplay">💰 0</div>
         <div id="menuMain">
-            <input type="text" id="playerName" class="vhs-input" placeholder="ВВЕДИ НИК" maxlength="20">
+            <input type="text" id="playerName" class="vhs-input" placeholder="ВВЕДИ НИК" maxlength="15" oninput="validateNameInput(this)">
             <button class="vhs-btn" onclick="window.showGame()">🎮 ИГРАТЬ</button>
+            <button class="vhs-btn shop-btn" onclick="window.openShop()">🛒 МАГАЗИН</button>
             <button class="vhs-btn" onclick="window.showStats()">📊 СТАТИСТИКА</button>
             <button class="vhs-btn" onclick="window.showSettings()">⚙ НАСТРОЙКИ</button>
             <button class="vhs-btn" onclick="window.exitGame()">🚪 ВЫХОД</button>
@@ -274,122 +518,513 @@
             </div>
             <button class="vhs-btn back-btn" onclick="window.backToMain()">◀ НАЗАД</button>
         </div>
+
+        <div id="menuShop" style="display:none;">
+            <div class="vhs-title">🛒 МАГАЗИН</div>
+            <div class="shop-tabs">
+                <div class="shop-tab active" data-tab="skins">👕 СКИНЫ</div>
+                <div class="shop-tab" data-tab="dancefloor">🎵 ТАНЦПОЛ</div>
+                <div class="shop-tab" data-tab="atmosphere">✨ АТМОСФЕРА</div>
+            </div>
+            <div id="shopList" class="shop-grid"></div>
+            <button class="vhs-btn back-btn" onclick="window.closeShop()">◀ НАЗАД В МЕНЮ</button>
+        </div>
     </div>
 </div>
 
 <div id="deathPanel" class="death-panel">
     <div class="death-text">🥤 НЕ ВЫВЕЗ ТУСУ 🥤</div>
-    <div class="restart-text">Нажмите R чтобы попробовать снова</div>
+    <div class="restart-text">[ R / К ] - ПРОБОВАТЬ СНОВА</div>
+    <div class="restart-text">[ TAB ] - В МАГАЗИН</div>
 </div>
 
 <canvas id="gameCanvas"></canvas>
 
 <script>
-    // ======================== МУЗЫКАЛЬНЫЙ ПЛЕЙЛИСТ ========================
-    // Список песен (сюда можно добавлять новые ссылки)
+    // === ГЛОБАЛЬНАЯ ПЕРЕМЕННАЯ ДЛЯ КЛАВИШ ===
+    const keys = {};
+
+    // === Валидация имени ===
+    window.validateNameInput = function(input) {
+        let cleaned = input.value.replace(/[^a-zA-Zа-яА-ЯёЁ0-9]/g, '');
+        if (cleaned.length > 15) cleaned = cleaned.slice(0, 15);
+        input.value = cleaned;
+    };
+
+    // === Обработка нажатий клавиш ===
+    document.addEventListener('keydown', (e) => {
+        const key = e.key;
+        keys[key] = true;
+        
+        if (key === 'r' || key === 'R' || key === 'к' || key === 'К') {
+            if (typeof gameRunning !== 'undefined' && !gameRunning && gamePaused && document.getElementById('deathPanel').style.display === 'block') {
+                e.preventDefault();
+                if (typeof restartGame === 'function') restartGame();
+            }
+        }
+        if (key === 'Tab') {
+            e.preventDefault();
+            if (typeof gameRunning !== 'undefined' && !gameRunning && gamePaused && document.getElementById('deathPanel').style.display === 'block') {
+                if (typeof exitToMenu === 'function') exitToMenu();
+            }
+        }
+        if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' ', 'Space'].includes(key)) e.preventDefault();
+    });
+    
+    document.addEventListener('keyup', (e) => { keys[e.key] = false; });
+
+    // ======================== ОБЛАЧНЫЕ СОХРАНЕНИЯ ========================
+    let ysdk = null;
+    let player = null;
+    let cloudDataLoaded = false;
+    let saveInProgress = false;
+    let useCloud = false;
+
+    let saveData = {
+        playerName: "АНОНИМ",
+        coins: 0,
+        currentSkin: "classic",
+        ownedSkins: ["classic"],
+        playersStats: [],
+        musicVolume: 0.3,
+        soundVolume: 0.5,
+        tutorialShown: false,
+        currentTheme: "default",
+        ownedThemes: ["default"],
+        currentEffect: "none",
+        ownedEffects: ["none"]
+    };
+
+    // ФОНОВЫЕ ТЕМЫ (ТАНЦПОЛ)
+    const THEMES = [
+        { id: "default", name: "КЛАССИЧЕСКАЯ", price: 0, style: { bg: "#111", gridColor: "rgba(0, 255, 255, 0.15)" } },
+        { id: "cyberpunk", name: "КИБЕРПАНК", price: 3, style: { bg: "#1a0a2a", gridColor: "rgba(255, 0, 255, 0.25)" } },
+        { id: "halloween", name: "ХЭЛЛОУИН", price: 3, style: { bg: "#1a0a00", gridColor: "rgba(255, 100, 0, 0.25)" } },
+        { id: "retro", name: "РЕТРО", price: 2, style: { bg: "#0a1a0a", gridColor: "rgba(0, 255, 0, 0.2)" } },
+        { id: "summer", name: "ЛЕТО", price: 2, style: { bg: "#1a2a0a", gridColor: "rgba(255, 200, 0, 0.2)" } }
+    ];
+
+    // ЭФФЕКТЫ АТМОСФЕРЫ
+    const EFFECTS = [
+        { id: "none", name: "БЕЗ ЭФФЕКТА", price: 0, desc: "Стандартный вид" },
+        { id: "sparks", name: "✨ ИСКРЫ", price: 1, desc: "Искры вокруг героя" },
+        { id: "glow", name: "💫 СВЕЧЕНИЕ", price: 2, desc: "Мягкое свечение" },
+        { id: "stars", name: "🌟 ЗВЁЗДЫ", price: 2, desc: "Маленькие звёзды парят вокруг" },
+        { id: "fire", name: "🔥 ОГНЕННЫЙ СЛЕД", price: 3, desc: "Огненные частицы" },
+        { id: "neon", name: "💜 НЕОНОВЫЙ ШЛЕЙФ", price: 4, desc: "Длинный неоновый хвост" }
+    ];
+
+    async function initYandexSDK() {
+        return new Promise((resolve, reject) => {
+            if (typeof YaGames !== 'undefined') {
+                resolve(YaGames);
+            } else {
+                const checkInterval = setInterval(() => {
+                    if (typeof YaGames !== 'undefined') {
+                        clearInterval(checkInterval);
+                        resolve(YaGames);
+                    }
+                }, 100);
+                setTimeout(() => {
+                    clearInterval(checkInterval);
+                    reject(new Error('SDK не загрузился'));
+                }, 5000);
+            }
+        });
+    }
+
+    async function saveToCloud() {
+        if (!player || saveInProgress || !useCloud) return;
+        saveInProgress = true;
+        try {
+            await player.setData({
+                playerName: saveData.playerName,
+                ownedSkins: saveData.ownedSkins,
+                playersStats: saveData.playersStats,
+                currentSkin: saveData.currentSkin,
+                musicVolume: saveData.musicVolume,
+                soundVolume: saveData.soundVolume,
+                tutorialShown: saveData.tutorialShown,
+                currentTheme: saveData.currentTheme,
+                ownedThemes: saveData.ownedThemes,
+                currentEffect: saveData.currentEffect,
+                ownedEffects: saveData.ownedEffects
+            });
+            await player.setStats({ coins: saveData.coins });
+            console.log('✅ Данные сохранены в облако');
+        } catch(e) { console.warn('Ошибка сохранения:', e);
+        } finally { saveInProgress = false; }
+    }
+
+    async function loadFromCloud() {
+        if (!player || !useCloud) return;
+        try {
+            const data = await player.getData(['playerName', 'ownedSkins', 'playersStats', 'currentSkin', 'musicVolume', 'soundVolume', 'tutorialShown', 'currentTheme', 'ownedThemes', 'currentEffect', 'ownedEffects']);
+            const stats = await player.getStats(['coins']);
+            if (data && data.playerName) saveData.playerName = data.playerName;
+            if (data && data.ownedSkins) saveData.ownedSkins = data.ownedSkins;
+            if (data && data.playersStats) saveData.playersStats = data.playersStats;
+            if (data && data.currentSkin) saveData.currentSkin = data.currentSkin;
+            if (data && data.musicVolume) saveData.musicVolume = data.musicVolume;
+            if (data && data.soundVolume) saveData.soundVolume = data.soundVolume;
+            if (data && data.tutorialShown !== undefined) saveData.tutorialShown = data.tutorialShown;
+            if (data && data.currentTheme) saveData.currentTheme = data.currentTheme;
+            if (data && data.ownedThemes) saveData.ownedThemes = data.ownedThemes;
+            if (data && data.currentEffect) saveData.currentEffect = data.currentEffect;
+            if (data && data.ownedEffects) saveData.ownedEffects = data.ownedEffects;
+            if (stats && stats.coins !== undefined) saveData.coins = stats.coins;
+            if (!saveData.ownedSkins || saveData.ownedSkins.length === 0) saveData.ownedSkins = ["classic"];
+            if (!saveData.currentSkin) saveData.currentSkin = "classic";
+            if (!saveData.playersStats) saveData.playersStats = [];
+            if (!saveData.ownedThemes || saveData.ownedThemes.length === 0) saveData.ownedThemes = ["default"];
+            if (!saveData.currentTheme) saveData.currentTheme = "default";
+            if (!saveData.ownedEffects || saveData.ownedEffects.length === 0) saveData.ownedEffects = ["none"];
+            if (!saveData.currentEffect) saveData.currentEffect = "none";
+            console.log('✅ Данные загружены из облака');
+        } catch(e) { console.warn('Ошибка загрузки:', e); }
+    }
+    
+    function loadFromLocalStorage() {
+        try {
+            const saved = localStorage.getItem('jaguarHellSave');
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                saveData = { ...saveData, ...parsed };
+                if (!saveData.ownedSkins) saveData.ownedSkins = ["classic"];
+                if (!saveData.currentSkin) saveData.currentSkin = "classic";
+                if (!saveData.playersStats) saveData.playersStats = [];
+                if (saveData.tutorialShown === undefined) saveData.tutorialShown = false;
+                if (!saveData.ownedThemes) saveData.ownedThemes = ["default"];
+                if (!saveData.currentTheme) saveData.currentTheme = "default";
+                if (!saveData.ownedEffects) saveData.ownedEffects = ["none"];
+                if (!saveData.currentEffect) saveData.currentEffect = "none";
+            }
+        } catch(e) {}
+    }
+    
+    function saveToLocalStorage() {
+        localStorage.setItem('jaguarHellSave', JSON.stringify(saveData));
+    }
+
+    function updateGameCoinsDisplay() {
+        const gameCoinsSpan = document.getElementById('gameCoins');
+        if(gameCoinsSpan) gameCoinsSpan.innerText = saveData.coins;
+    }
+
+    async function initCloudSaves() {
+        try {
+            const YaGames = await initYandexSDK();
+            ysdk = await YaGames.init();
+            player = await ysdk.getPlayer();
+            if (!player.isAuthorized()) {
+                try {
+                    await ysdk.auth.openAuthDialog();
+                    player = await ysdk.getPlayer();
+                } catch(e) { console.log('Игрок не авторизовался'); }
+            }
+            useCloud = true;
+            await loadFromCloud();
+            
+            if (!saveData.tutorialShown) {
+                document.getElementById('tutorialModal').style.display = 'flex';
+            } else {
+                document.getElementById('tutorialModal').style.display = 'none';
+            }
+            document.getElementById('closeTutorialBtn').onclick = () => {
+                document.getElementById('tutorialModal').style.display = 'none';
+                saveData.tutorialShown = true;
+                saveGame();
+            };
+
+            document.getElementById('playerName').value = saveData.playerName;
+            document.getElementById('soundVolume').value = saveData.soundVolume * 100;
+            document.getElementById('musicVolume').value = saveData.musicVolume * 100;
+            setSoundVolume(saveData.soundVolume * 100);
+            setMusicVolume(saveData.musicVolume);
+            updateCoinsDisplay();
+            
+            if (player.isAuthorized() && saveData.playerName === "АНОНИМ") {
+                const yaName = player.getName();
+                if (yaName && yaName !== "Player") {
+                    saveData.playerName = yaName;
+                    document.getElementById('playerName').value = yaName;
+                    await saveToCloud();
+                }
+            }
+            cloudDataLoaded = true;
+            document.getElementById('loadingOverlay').style.display = 'none';
+            document.getElementById('vhsMenu').style.display = 'flex';
+        } catch(e) {
+            console.warn('Ошибка инициализации SDK, используем локальное сохранение:', e);
+            useCloud = false;
+            loadFromLocalStorage();
+            
+            if (!saveData.tutorialShown) {
+                document.getElementById('tutorialModal').style.display = 'flex';
+            } else {
+                document.getElementById('tutorialModal').style.display = 'none';
+            }
+            document.getElementById('closeTutorialBtn').onclick = () => {
+                document.getElementById('tutorialModal').style.display = 'none';
+                saveData.tutorialShown = true;
+                saveGame();
+            };
+            
+            document.getElementById('playerName').value = saveData.playerName;
+            document.getElementById('soundVolume').value = saveData.soundVolume * 100;
+            document.getElementById('musicVolume').value = saveData.musicVolume * 100;
+            setSoundVolume(saveData.soundVolume * 100);
+            setMusicVolume(saveData.musicVolume);
+            updateCoinsDisplay();
+            cloudDataLoaded = true;
+            document.getElementById('loadingOverlay').style.display = 'none';
+            document.getElementById('vhsMenu').style.display = 'flex';
+        }
+    }
+
+    async function saveGame() {
+        updateCoinsDisplay();
+        updateGameCoinsDisplay();
+        if (useCloud && player && cloudDataLoaded) {
+            await saveToCloud();
+        } else {
+            saveToLocalStorage();
+        }
+    }
+
+    function addCoins(amount) {
+        saveData.coins += amount;
+        saveGame();
+    }
+
+    function updateCoinsDisplay() {
+        const displays = document.querySelectorAll('.coins-display');
+        displays.forEach(d => { if(d) d.innerHTML = `💰 ${saveData.coins}`; });
+        updateGameCoinsDisplay();
+    }
+
+    // ======================== СКИНЫ ========================
+    const SKINS = [
+        { id: 'classic', name: 'СИДОДЖИК', price: 0, imageUrl: 'https://od.lk/s/OTdfMTAzNzA4MDE4Xw/hero.png' },
+        { id: 'neon', name: 'ПЛЯЖНЫЙ ПАРЕНЬ', price: 2, imageUrl: 'https://od.lk/s/OTdfMTAzNzA4MDE3Xw/hero1.png' },
+        { id: 'cyber', name: 'СЕЛЬСКИЙ ПАРЕНЬ', price: 5, imageUrl: 'https://od.lk/s/OTdfMTAzNzMzMzM3Xw/hero2.png' },
+        { id: 'golden', name: 'НАСТЯ 9Г', price: 1, imageUrl: 'https://od.lk/s/OTdfMTAzNzMzMzM4Xw/hero3.png' },
+        { id: 'glitch', name: 'ЖИДКИЙ ТЕРМИНАТОР', price: 2, imageUrl: 'https://od.lk/s/OTdfMTAzNzMzMzQxXw/hero4.png' },
+        { id: 'street', name: 'РУБАХА ПАРЕНЬ', price: 1, imageUrl: 'https://od.lk/s/OTdfMTAzNzMzMzQyXw/hero5.png' }
+    ];
+
+    let skinImages = {};
+    let skinPreviews = {};
+
+    function buySkin(skinId) {
+        const skin = SKINS.find(s => s.id === skinId);
+        if(!skin) return false;
+        if(saveData.ownedSkins.includes(skinId)) return false;
+        if(saveData.coins < skin.price) return false;
+        saveData.coins -= skin.price;
+        saveData.ownedSkins.push(skinId);
+        saveGame();
+        renderShop();
+        return true;
+    }
+
+    function selectSkin(skinId) {
+        if(!saveData.ownedSkins.includes(skinId)) return false;
+        saveData.currentSkin = skinId;
+        saveGame();
+        renderShop();
+        return true;
+    }
+
+    // ======================== ТЕМЫ (ТАНЦПОЛ) ========================
+    function buyTheme(themeId) {
+        const theme = THEMES.find(t => t.id === themeId);
+        if(!theme) return false;
+        if(saveData.ownedThemes.includes(themeId)) return false;
+        if(saveData.coins < theme.price) return false;
+        saveData.coins -= theme.price;
+        saveData.ownedThemes.push(themeId);
+        saveGame();
+        renderShop();
+        return true;
+    }
+
+    function selectTheme(themeId) {
+        if(!saveData.ownedThemes.includes(themeId)) return false;
+        saveData.currentTheme = themeId;
+        saveGame();
+        renderShop();
+        return true;
+    }
+
+    function getCurrentTheme() {
+        return THEMES.find(t => t.id === saveData.currentTheme) || THEMES[0];
+    }
+
+    // ======================== ЭФФЕКТЫ (АТМОСФЕРА) ========================
+    function buyEffect(effectId) {
+        const effect = EFFECTS.find(e => e.id === effectId);
+        if(!effect) return false;
+        if(saveData.ownedEffects.includes(effectId)) return false;
+        if(saveData.coins < effect.price) return false;
+        saveData.coins -= effect.price;
+        saveData.ownedEffects.push(effectId);
+        saveGame();
+        renderShop();
+        return true;
+    }
+
+    function selectEffect(effectId) {
+        if(!saveData.ownedEffects.includes(effectId)) return false;
+        saveData.currentEffect = effectId;
+        saveGame();
+        renderShop();
+        return true;
+    }
+
+    function getCurrentEffect() {
+        return EFFECTS.find(e => e.id === saveData.currentEffect) || EFFECTS[0];
+    }
+
+    // ======================== ОТРИСОВКА ЭФФЕКТОВ ========================
+    let particles = [];
+
+    function initEffectParticles() {
+        particles = [];
+        for(let i = 0; i < 40; i++) {
+            particles.push({
+                x: playerObj.x + playerObj.size/2,
+                y: playerObj.y + playerObj.size/2,
+                vx: (Math.random() - 0.5) * 2,
+                vy: (Math.random() - 0.5) * 2 - 1,
+                life: 60 + Math.random() * 60,
+                maxLife: 60 + Math.random() * 60,
+                size: 2 + Math.random() * 4,
+                color: `hsl(${Math.random() * 60 + 20}, 100%, 60%)`
+            });
+        }
+    }
+
+    function updateEffectParticles() {
+        const effect = getCurrentEffect();
+        if(effect.id === "none") {
+            particles = [];
+            return;
+        }
+
+        const centerX = playerObj.x + playerObj.size/2;
+        const centerY = playerObj.y + playerObj.size/2;
+
+        for(let i = particles.length - 1; i >= 0; i--) {
+            const p = particles[i];
+            p.x += p.vx;
+            p.y += p.vy;
+            p.life--;
+
+            if(p.life <= 0) {
+                particles.splice(i, 1);
+                continue;
+            }
+
+            // Разные эффекты
+            if(effect.id === "sparks") {
+                p.vx += (Math.random() - 0.5) * 0.3;
+                p.vy += Math.random() * 0.1 - 0.05;
+                p.color = `hsl(${Math.random() * 60 + 20}, 100%, ${50 + Math.random() * 50}%)`;
+            } else if(effect.id === "glow") {
+                p.vy -= 0.05;
+                p.vx *= 0.98;
+                p.color = `hsl(${200 + Math.sin(Date.now() * 0.001) * 30}, 100%, 70%)`;
+            } else if(effect.id === "stars") {
+                p.vx *= 0.98;
+                p.vy *= 0.98;
+                const angle = Math.atan2(p.y - centerY, p.x - centerX);
+                const dist = Math.hypot(p.y - centerY, p.x - centerX);
+                if(dist > 80) {
+                    p.x = centerX + Math.cos(angle) * 80;
+                    p.y = centerY + Math.sin(angle) * 80;
+                }
+                p.color = `hsl(${Math.random() * 360}, 100%, 80%)`;
+            } else if(effect.id === "fire") {
+                p.vy -= 0.08;
+                p.vx += (Math.random() - 0.5) * 0.2;
+                p.color = `hsl(${20 + Math.random() * 30}, 100%, ${50 + Math.random() * 40}%)`;
+            } else if(effect.id === "neon") {
+                p.vx += (Math.random() - 0.5) * 0.1;
+                p.vy += (Math.random() - 0.5) * 0.1;
+                p.color = `hsl(${280 + Math.sin(Date.now() * 0.002 + i) * 40}, 100%, 70%)`;
+            }
+        }
+
+        // Создаём новые частицы
+        const spawnRate = effect.id === "sparks" ? 4 : effect.id === "neon" ? 5 : 3;
+        if(particles.length < 60) {
+            for(let i = 0; i < spawnRate; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const speed = effect.id === "neon" ? 1 + Math.random() * 1.5 : 1 + Math.random() * 2;
+                particles.push({
+                    x: centerX,
+                    y: centerY,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed - 0.5,
+                    life: 40 + Math.random() * 40,
+                    maxLife: 40 + Math.random() * 40,
+                    size: 2 + Math.random() * 3,
+                    color: `hsl(${Math.random() * 60 + 20}, 100%, 60%)`
+                });
+            }
+        }
+    }
+
+    function drawEffectParticles() {
+        const effect = getCurrentEffect();
+        if(effect.id === "none") return;
+
+        for(let p of particles) {
+            ctx.save();
+            ctx.globalAlpha = p.life / p.maxLife * 0.8;
+            ctx.shadowBlur = 8;
+            ctx.shadowColor = p.color;
+            ctx.fillStyle = p.color;
+            ctx.beginPath();
+            if(effect.id === "stars") {
+                const size = p.size * 1.5;
+                ctx.arc(p.x, p.y, size, 0, Math.PI * 2);
+            } else {
+                ctx.arc(p.x, p.y, p.size * 0.7, 0, Math.PI * 2);
+            }
+            ctx.fill();
+            ctx.restore();
+        }
+    }
+
+    // ======================== МУЗЫКА ========================
     const playlist = [
         { url: 'https://od.lk/s/OTdfMTAyNzU4MDA1Xw/TECHNO.mp3', name: 'TECHNO' },
         { url: 'https://od.lk/s/OTdfMTAyNzU4MDA0Xw/tektonikN1.mp3', name: 'TEKTONIK N1' },
-		{ url: 'https://od.lk/s/OTdfMTAyNzc1MzM0Xw/Tony%20De%20Vit%20-%20The%20Dawn%20%28Original%20Mix%29.mp3', name: 'TonyMix7' },
-		{ url: 'https://od.lk/s/OTdfMTAyNzc1MjcyXw/The%20Peppermint%20Lounge%20-%20Lemon%20Project.mp3', name: 'PeppermintLemon' },
-		{ url: 'https://od.lk/s/OTdfMTAyNzc1MTk1Xw/Sonic%20Mine%20%28Remix%29%20-%20Benny.mp3', name: 'Benny' },
-		{ url: 'https://od.lk/s/OTdfMTAyNzc1MjEyXw/Microwave%20Prince%20-%20I%20Need%20Your%20Love%20%28Extended%20Ver.mp3', name: 'YourLove' },
-		{ url: 'https://od.lk/s/OTdfMTAyNzc1MTQ3Xw/AWeX%20-%20It%27s%20Our%20Future.mp3', name: 'FutureAwex' },
-		{ url: 'https://od.lk/s/OTdfMTAyNzc1MTE5Xw/90s%20RAVE%20%26%20TRANCE%20CLASSICS.mp3', name: 'Rave 90s CLASSICS' }
-        // ДОБАВЛЯЙ НОВЫЕ ПЕСНИ СЮДА:
-        // { url: 'ССЫЛКА_НА_MP3', name: 'НАЗВАНИЕ_ТРЕКА' },
+        { url: 'https://od.lk/s/OTdfMTAyNzc1MzM0Xw/Tony%20De%20Vit%20-%20The%20Dawn%20%28Original%20Mix%29.mp3', name: 'TonyMix7' },
+        { url: 'https://od.lk/s/OTdfMTAyNzc1MjcyXw/The%20Peppermint%20Lounge%20-%20Lemon%20Project.mp3', name: 'PeppermintLemon' },
+        { url: 'https://od.lk/s/OTdfMTAyNzc1MTk1Xw/Sonic%20Mine%20%28Remix%29%20-%20Benny.mp3', name: 'Benny' },
+        { url: 'https://od.lk/s/OTdfMTAyNzc1MjEyXw/Microwave%20Prince%20-%20I%20Need%20Your%20Love%20%28Extended%20Ver.mp3', name: 'YourLove' },
+        { url: 'https://od.lk/s/OTdfMTAyNzc1MTQ3Xw/AWeX%20-%20It%27s%20Our%20Future.mp3', name: 'FutureAwex' },
+        { url: 'https://od.lk/s/OTdfMTAyNzc1MTE5Xw/90s%20RAVE%20%26%20TRANCE%20CLASSICS.mp3', name: 'Rave 90s CLASSICS' }
     ];
     
     let currentAudio = null;
     let currentTrackIndex = -1;
     let musicEnabled = true;
-    let musicVolume = 0.3;
     let musicStarted = false;
+    let gameRunning = false;
+    let gamePaused = false;
+    let totalDeaths = 0;
+    let time = 0;
+    let currentLevelIdx = 0;
+    let screenShake = 0;
+    let enemies = [];
+    let isPatternLevel = false;
+    let patternEnemies = [];
+    let coins = [];
     
-    // Функция для получения случайного трека
-    function getRandomTrack() {
-        if(playlist.length === 0) return -1;
-        if(playlist.length === 1) return 0;
-        
-        let newIndex;
-        do {
-            newIndex = Math.floor(Math.random() * playlist.length);
-        } while(newIndex === currentTrackIndex);
-        return newIndex;
-    }
-    
-    // Функция для получения первого случайного трека (при старте)
-    function getFirstRandomTrack() {
-        if(playlist.length === 0) return -1;
-        if(playlist.length === 1) return 0;
-        return Math.floor(Math.random() * playlist.length);
-    }
-    
-    // Функция воспроизведения музыки
-    function playMusic(isFirstStart = false) {
-        if(!musicEnabled || !musicStarted) return;
-        if(playlist.length === 0) return;
-        
-        // Останавливаем текущий трек
-        if(currentAudio) {
-            currentAudio.pause();
-            currentAudio = null;
-        }
-        
-        // Выбираем трек: если первый старт - случайный, если переключение - случайный не повторяя предыдущий
-        let trackIndex;
-        if(isFirstStart) {
-            trackIndex = getFirstRandomTrack();
-            currentTrackIndex = trackIndex;
-        } else {
-            trackIndex = getRandomTrack();
-            if(trackIndex === -1) trackIndex = 0;
-            currentTrackIndex = trackIndex;
-        }
-        
-        const track = playlist[currentTrackIndex];
-        if(!track) return;
-        
-        currentAudio = new Audio(track.url);
-        currentAudio.volume = musicVolume;
-        currentAudio.loop = false;
-        
-        // Обновляем информацию о треке
-        const trackInfo = document.getElementById('trackInfo');
-        trackInfo.innerHTML = `🎵 ${track.name} | 🎧 ГРОМК.: ${Math.round(musicVolume * 100)}%`;
-        
-        currentAudio.play().catch(e => {
-            console.log('Автовоспроизведение заблокировано, нужно взаимодействие с игрой');
-            trackInfo.innerHTML = `🎵 МУЗЫКА ГОТОВА (НАЖМИ НА ЭКРАН)`;
-        });
-        
-        // Когда трек закончился - играем следующий случайный (без флага первого старта)
-        currentAudio.addEventListener('ended', () => {
-            if(musicEnabled && musicStarted) {
-                playMusic(false);
-            }
-        });
-        
-        currentAudio.addEventListener('error', () => {
-            console.error('Ошибка загрузки трека:', track.name);
-            trackInfo.innerHTML = `⚠️ ОШИБКА ЗАГРУЗКИ: ${track.name}`;
-            setTimeout(() => {
-                if(musicEnabled && musicStarted) {
-                    playMusic(false);
-                }
-            }, 2000);
-        });
-    }
-    
-    // Функция для запуска музыки (вызывается при первом взаимодействии)
-    function startMusic() {
-        if(!musicStarted && musicEnabled && playlist.length > 0) {
-            musicStarted = true;
-            playMusic(true); // true = первый старт, выбираем случайный трек
-        }
-    }
-    
-    // Остановка музыки
     function stopMusic() {
         if(currentAudio) {
             currentAudio.pause();
@@ -398,56 +1033,54 @@
         musicStarted = false;
     }
     
-    // Установка громкости музыки
-    function setMusicVolume(value) {
-        musicVolume = value;
-        if(currentAudio) {
-            currentAudio.volume = musicVolume;
-        }
-        const trackInfo = document.getElementById('trackInfo');
-        if(musicEnabled && currentAudio && currentAudio.src) {
-            const track = playlist[currentTrackIndex];
-            if(track) {
-                trackInfo.innerHTML = `🎵 ${track.name} | 🎧 ГРОМК.: ${Math.round(musicVolume * 100)}%`;
-            }
-        }
-        localStorage.setItem('musicVolume', musicVolume);
+    function getFirstRandomTrack() { return playlist.length ? Math.floor(Math.random() * playlist.length) : -1; }
+    function getRandomTrack() {
+        if(playlist.length <= 1) return 0;
+        let newIndex; do { newIndex = Math.floor(Math.random() * playlist.length); } while(newIndex === currentTrackIndex);
+        return newIndex;
     }
     
-    // Переключение на следующий трек (случайный, не повторяя текущий)
-    function nextTrack() {
-        if(!musicEnabled) {
-            if(playlist.length > 0) {
-                musicEnabled = true;
-                musicStarted = true;
-                playMusic(true);
-            }
-            return;
-        }
-        if(!musicStarted) {
-            musicStarted = true;
-            playMusic(true);
-            return;
-        }
-        // Принудительно переключаем на другой случайный трек
-        if(currentAudio) {
-            currentAudio.pause();
-            currentAudio = null;
-        }
-        playMusic(false);
+    function playMusic(isFirstStart = false) {
+        if(!musicEnabled || !musicStarted || !playlist.length) return;
+        if(currentAudio) { currentAudio.pause(); currentAudio = null; }
+        let trackIndex = isFirstStart ? getFirstRandomTrack() : getRandomTrack();
+        if(trackIndex === -1) trackIndex = 0;
+        currentTrackIndex = trackIndex;
+        const track = playlist[currentTrackIndex];
+        currentAudio = new Audio(track.url);
+        currentAudio.volume = saveData.musicVolume;
+        currentAudio.loop = false;
+        document.getElementById('trackInfo').innerHTML = `🎵 ${track.name} | 🎧 ${Math.round(saveData.musicVolume * 100)}%`;
+        currentAudio.play().catch(e => {});
+        currentAudio.addEventListener('ended', () => { if(musicEnabled && musicStarted && gameRunning && !gamePaused) playMusic(false); });
     }
     
-    // ======================== ЗВУКОВЫЕ ЭФФЕКТЫ ========================
+    function startMusic() { if(!musicStarted && musicEnabled && playlist.length && gameRunning && !gamePaused) { musicStarted = true; playMusic(true); } }
+    function setMusicVolume(value) { saveData.musicVolume = value; if(currentAudio) currentAudio.volume = saveData.musicVolume; saveGame(); }
+    function nextTrack() { if(currentAudio) { currentAudio.pause(); currentAudio = null; } if(!musicStarted) { musicStarted = true; playMusic(true); } else { playMusic(false); } }
+    
+    // ======================== ЗВУКИ ========================
     const hitSound = new Audio('https://od.lk/s/OTdfMTAyNzU4MDAxXw/kikbootle.wav');
     hitSound.volume = 0.5;
     hitSound.load();
     
+    const coinSound = new Audio('https://od.lk/s/OTdfMTAzNzE0NDM0Xw/soundeffectV2.MP3');
+    coinSound.volume = 0.4;
+    coinSound.load();
+    
     let soundEnabled = true;
     let soundVolume = 0.5;
+    
+    function playCoinSound() {
+        if(!soundEnabled) return;
+        coinSound.currentTime = 0;
+        coinSound.play().catch(e => console.log('Звук монеты не воспроизвелся:', e));
+    }
     
     function setSoundVolume(value) {
         soundVolume = value / 100;
         hitSound.volume = soundVolume;
+        coinSound.volume = soundVolume * 0.8;
         soundEnabled = soundVolume > 0;
         localStorage.setItem('soundVolume', soundVolume);
     }
@@ -458,118 +1091,15 @@
         hitSound.play().catch(e => console.log('Звук не воспроизвелся:', e));
     }
     
-    // Загрузка сохраненных настроек громкости
-    const savedMusicVolume = localStorage.getItem('musicVolume');
-    if(savedMusicVolume !== null) musicVolume = parseFloat(savedMusicVolume);
-    const savedSoundVolume = localStorage.getItem('soundVolume');
-    if(savedSoundVolume !== null) soundVolume = parseFloat(savedSoundVolume);
-    
-    // Глобальные функции для меню
-    window.showGame = function() {
-        const nameInput = document.getElementById('playerName');
-        if(nameInput.value.trim()) {
-            currentPlayerName = nameInput.value.trim().toUpperCase();
-        }
-        document.getElementById('vhsMenu').classList.add('hidden');
-        gameRunning = true;
-        gamePaused = false;
-        totalDeaths = 0;
-        currentLevelIdx = 0;
-        createLevel(0);
-        resetPlayerPosition();
-        time = 0;
-        updateUI();
-        
-        // Запускаем музыку при старте игры (со случайным треком!)
-        startMusic();
-    };
-    
-    window.showStats = function() {
-        document.getElementById('menuMain').style.display = 'none';
-        document.getElementById('menuStats').style.display = 'block';
-        const statsDiv = document.getElementById('statsList');
-        if(playersStats.length === 0) {
-            statsDiv.innerHTML = '<div class="stat-item">📭 НЕТ ДАННЫХ</div>';
-        } else {
-            statsDiv.innerHTML = playersStats.map(s => 
-                `<div class="stat-item">🎮 ${s.name} | 💀 ${s.deaths} | 🌍 ${s.level} ур. | ${s.date}</div>`
-            ).join('');
-        }
-    };
-    
-    window.showSettings = function() {
-        document.getElementById('menuMain').style.display = 'none';
-        document.getElementById('menuSettings').style.display = 'block';
-        const soundSlider = document.getElementById('soundVolume');
-        soundSlider.value = soundVolume * 100;
-        soundSlider.oninput = (e) => {
-            setSoundVolume(e.target.value);
-        };
-        const musicSlider = document.getElementById('musicVolume');
-        musicSlider.value = musicVolume * 100;
-        musicSlider.oninput = (e) => {
-            setMusicVolume(e.target.value / 100);
-        };
-        const nextBtn = document.getElementById('nextTrackBtn');
-        nextBtn.onclick = () => {
-            nextTrack();
-        };
-    };
-    
-    window.backToMain = function() {
-        document.getElementById('menuMain').style.display = 'block';
-        document.getElementById('menuStats').style.display = 'none';
-        document.getElementById('menuSettings').style.display = 'none';
-    };
-    
-    window.exitGame = function() {
-        stopMusic();
-        window.close();
-        alert('Закройте вкладку браузера');
-    };
-    
-    // ======================== НАСТРОЙКИ ========================
+    // ======================== ИГРОВЫЕ ПАРАМЕТРЫ ========================
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
+    let canvasW = window.innerWidth, canvasH = window.innerHeight;
     
-    let canvasW = window.innerWidth;
-    let canvasH = window.innerHeight;
-    
-    // Состояние игры
-    let gameRunning = false;
-    let gamePaused = false;
-    let totalDeaths = 0;
-    let time = 0;
-    let currentLevelIdx = 0;
-    let currentPlayerName = "АНОНИМ";
-    let screenShake = 0;
-    
-    // UI элементы
     const deathsSpan = document.getElementById('deaths');
     const levelSpan = document.getElementById('level');
     
-    // Статистика
-    let playersStats = JSON.parse(localStorage.getItem('jaguarStats')) || [];
-    
-    function saveStats() {
-        localStorage.setItem('jaguarStats', JSON.stringify(playersStats));
-    }
-    
-    function addStats(name, deathsCount, level) {
-        playersStats.unshift({
-            name: name,
-            deaths: deathsCount,
-            level: level,
-            date: new Date().toLocaleString()
-        });
-        if(playersStats.length > 20) playersStats.pop();
-        saveStats();
-    }
-    
-    function updateUI() {
-        deathsSpan.innerText = totalDeaths;
-        levelSpan.innerText = currentLevelIdx + 1;
-    }
+    function updateUI() { deathsSpan.innerText = totalDeaths; levelSpan.innerText = currentLevelIdx + 1; }
     
     function resizeCanvas() {
         canvas.width = window.innerWidth;
@@ -577,167 +1107,328 @@
         canvasW = canvas.width;
         canvasH = canvas.height;
         updateGoalPosition();
-        if(player) {
-            player.x = Math.min(Math.max(player.x, 0), canvasW - player.size);
-            player.y = Math.min(Math.max(player.y, 0), canvasH - player.size);
+        if(playerObj) {
+            playerObj.x = Math.min(Math.max(playerObj.x, 0), canvasW - playerObj.size);
+            playerObj.y = Math.min(Math.max(playerObj.y, 0), canvasH - playerObj.size);
         }
     }
     
-    // ======================== ЗАГРУЗКА СПРАЙТ-ЛИСТА ========================
+    // ======================== СПРАЙТЫ ========================
     const heroSprite = new Image();
     heroSprite.src = 'hero.png?' + Date.now();
-    
-    const spriteConfig = {
-        frameWidth: 80,
-        frameHeight: 40,
-        totalFrames: 4,
-        framesPerSecond: 10
-    };
-    
-    let currentFrame = 0;
-    let frameTimer = 0;
-    let spriteReady = false;
-    
-    heroSprite.onload = () => {
-        spriteReady = true;
-        console.log('hero.png загружен');
-    };
+    const spriteConfig = { frameWidth: 80, frameHeight: 40, totalFrames: 4, framesPerSecond: 10 };
+    let currentFrame = 0, frameTimer = 0, spriteReady = false;
     
     const jaguarImg = new Image();
     jaguarImg.src = 'jaguar.png?' + Date.now();
     let jaguarReady = false;
+    jaguarImg.onload = () => { jaguarReady = true; };
     
-    jaguarImg.onload = () => {
-        jaguarReady = true;
+    function createPreviewFromSprite(img, skinId) {
+        const previewCanvas = document.createElement('canvas');
+        previewCanvas.width = 60;
+        previewCanvas.height = 60;
+        const pCtx = previewCanvas.getContext('2d');
+        if(img && img.complete && img.naturalWidth > 0) {
+            pCtx.drawImage(img, 0, 0, 80, 40, 0, 10, 60, 30);
+        } else {
+            pCtx.fillStyle = '#ff00ff';
+            pCtx.fillRect(0, 0, 60, 60);
+            pCtx.fillStyle = '#fff';
+            pCtx.font = 'bold 10px monospace';
+            const skinName = SKINS.find(s => s.id === skinId)?.name || skinId;
+            pCtx.fillText(skinName.substring(0, 4), 12, 30);
+        }
+        return previewCanvas;
+    }
+    
+    function loadAllSkins() {
+        for(let skin of SKINS) {
+            if(skin.imageUrl) {
+                const img = new Image();
+                img.src = skin.imageUrl + '?' + Date.now();
+                img.onload = () => {
+                    skinImages[skin.id] = img;
+                    skinPreviews[skin.id] = createPreviewFromSprite(img, skin.id);
+                    renderShop();
+                };
+                img.onerror = () => {
+                    console.warn(`Не удалось загрузить ${skin.name}: ${skin.imageUrl}`);
+                    skinPreviews[skin.id] = createPreviewFromSprite(heroSprite, skin.id);
+                    renderShop();
+                };
+            } else {
+                if(heroSprite.complete && heroSprite.naturalWidth > 0) {
+                    skinPreviews[skin.id] = createPreviewFromSprite(heroSprite, skin.id);
+                } else {
+                    heroSprite.onload = () => {
+                        skinPreviews[skin.id] = createPreviewFromSprite(heroSprite, skin.id);
+                        renderShop();
+                    };
+                }
+            }
+        }
+        renderShop();
+    }
+    
+    heroSprite.onload = () => {
+        spriteReady = true;
+        for(let skin of SKINS) {
+            if(!skinPreviews[skin.id]) {
+                skinPreviews[skin.id] = createPreviewFromSprite(heroSprite, skin.id);
+            }
+        }
+        renderShop();
     };
     
     // ======================== ИГРОК ========================
-    const player = {
-        x: 80,
-        y: canvasH / 2,
-        size: 40,
-        speed: 5.3,
-        anim: 0,
+    const playerObj = {
+        x: 80, y: canvasH/2, size: 40, speed: 5.3, anim: 0,
         update() {
             if(!gameRunning || gamePaused) return;
             let dx = 0, dy = 0;
-            if(keys.ArrowLeft || keys.a) dx = -this.speed;
-            if(keys.ArrowRight || keys.d) dx = this.speed;
-            if(keys.ArrowUp || keys.w) dy = -this.speed;
-            if(keys.ArrowDown || keys.s) dy = this.speed;
-            
-            let newX = this.x + dx;
-            let newY = this.y + dy;
+            if(keys['ArrowLeft'] || keys['a']) dx = -this.speed;
+            if(keys['ArrowRight'] || keys['d']) dx = this.speed;
+            if(keys['ArrowUp'] || keys['w']) dy = -this.speed;
+            if(keys['ArrowDown'] || keys['s']) dy = this.speed;
+            let newX = this.x + dx, newY = this.y + dy;
             this.x = Math.min(Math.max(newX, 0), canvasW - this.size);
             this.y = Math.min(Math.max(newY, 0), canvasH - this.size);
             this.anim += 0.22;
         },
         draw() {
             const bounce = Math.sin(this.anim) * 5;
+            const skinImg = skinImages[saveData.currentSkin] || heroSprite;
             
-            if(spriteReady && heroSprite.complete) {
-                frameTimer++;
-                const frameDelay = Math.floor(60 / spriteConfig.framesPerSecond);
-                if(frameTimer >= frameDelay) {
-                    frameTimer = 0;
-                    currentFrame = (currentFrame + 1) % spriteConfig.totalFrames;
-                }
-                
-                ctx.save();
-                ctx.shadowBlur = 12;
-                ctx.shadowColor = '#ff44ff';
-                ctx.drawImage(
-                    heroSprite,
-                    currentFrame * spriteConfig.frameWidth, 0,
-                    spriteConfig.frameWidth,
-                    spriteConfig.frameHeight,
-                    this.x,
-                    this.y + bounce,
-                    this.size,
-                    this.size
-                );
-                ctx.restore();
+            ctx.save();
+            ctx.shadowBlur = 12;
+            ctx.shadowColor = '#ff44ff';
+            
+            frameTimer++;
+            if(frameTimer >= Math.floor(60 / spriteConfig.framesPerSecond)) {
+                frameTimer = 0;
+                currentFrame = (currentFrame + 1) % spriteConfig.totalFrames;
+            }
+            
+            if(skinImg && skinImg.complete && skinImg.naturalWidth > 0) {
+                ctx.drawImage(skinImg, currentFrame * 80, 0, 80, 40, this.x, this.y + bounce, this.size, this.size);
+            } else if(heroSprite.complete) {
+                ctx.drawImage(heroSprite, currentFrame * 80, 0, 80, 40, this.x, this.y + bounce, this.size, this.size);
             } else {
                 ctx.fillStyle = '#ff33cc';
                 ctx.fillRect(this.x, this.y + bounce, this.size, this.size);
             }
+            ctx.restore();
         }
     };
     
-    // ======================== ВРАГ ========================
-    class JaguarBottle {
-        constructor(x, y, vx, vy, radius = 22) {
+    // ======================== МОНЕТА ========================
+    class Coin {
+        constructor(x, y) {
             this.x = x;
             this.y = y;
-            this.vx = vx;
-            this.vy = vy;
-            this.radius = radius;
-            this.angle = 0;
-            this.wobbleOffset = Math.random() * Math.PI * 2;
-            this.drawWidth = 32;
-            this.drawHeight = 56;
+            this.radius = 12;
+            this.collected = false;
+            this.angle = Math.random() * Math.PI * 2;
+        }
+        update() { this.angle += 0.05; }
+        draw() {
+            if(this.collected) return;
+            ctx.save();
+            ctx.translate(this.x, this.y);
+            ctx.rotate(this.angle);
+            ctx.shadowBlur = 6;
+            ctx.shadowColor = '#ffcc00';
+            ctx.beginPath();
+            ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
+            ctx.fillStyle = '#ffcc00';
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(0, 0, this.radius - 3, 0, Math.PI * 2);
+            ctx.fillStyle = '#ff8800';
+            ctx.fill();
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 14px monospace';
+            ctx.fillText('💰', -7, -8);
+            ctx.restore();
+        }
+        checkCollision(px, py, psize) {
+            if(this.collected) return false;
+            const dx = (px + psize/2) - this.x;
+            const dy = (py + psize/2) - this.y;
+            if(Math.hypot(dx, dy) < this.radius + psize/2) {
+                this.collected = true;
+                addCoins(1);
+                playCoinSound();
+                return true;
+            }
+            return false;
+        }
+    }
+    
+    function spawnCoinsForLevel() {
+        coins = [];
+        const minX = startZone.x + startZone.w + 30;
+        const maxX = goal.x - 30;
+        const minY = 60;
+        const maxY = canvasH - 60;
+        
+        const coinCount = 2 + Math.floor(Math.random() * 4);
+        
+        for(let i = 0; i < coinCount; i++) {
+            let attempts = 0;
+            let placed = false;
+            while(!placed && attempts < 50) {
+                const randX = minX + Math.random() * (maxX - minX);
+                const randY = minY + Math.random() * (maxY - minY);
+                const inStart = (randX > startZone.x - 30 && randX < startZone.x + startZone.w + 30 && randY > startZone.y - 30 && randY < startZone.y + startZone.h + 30);
+                const inFinish = (randX > goal.x - 30 && randX < goal.x + goal.w + 30 && randY > goal.y - 30 && randY < goal.y + goal.h + 30);
+                if (!inStart && !inFinish) {
+                    coins.push(new Coin(randX, randY));
+                    placed = true;
+                }
+                attempts++;
+            }
+            if (!placed) {
+                coins.push(new Coin(minX + 50 + (i * 80), canvasH/2));
+            }
+        }
+    }
+    
+    // ======================== ВРАГИ ========================
+    class JaguarBottle {
+        constructor(x, y, vx, vy, radius = 22) {
+            this.x = x; this.y = y; this.vx = vx; this.vy = vy; this.radius = radius;
+            this.angle = 0; this.wobbleOffset = Math.random() * Math.PI * 2;
+            this.drawWidth = 32; this.drawHeight = 56;
         }
         update() {
             if(!gameRunning || gamePaused) return;
-            this.x += this.vx;
-            this.y += this.vy;
-            this.angle += 0.09;
-            
+            this.x += this.vx; this.y += this.vy; this.angle += 0.09;
             if(this.x + this.radius < 0) this.x = canvasW + this.radius;
             if(this.x - this.radius > canvasW) this.x = -this.radius;
             if(this.y + this.radius < 0) this.y = canvasH + this.radius;
             if(this.y - this.radius > canvasH) this.y = -this.radius;
-            
             this.y += Math.sin(time * 1.7 + this.x * 0.012 + this.wobbleOffset) * 0.65;
-            
-            if(this.isInStartZone() || this.isInFinishZone()) {
-                this.repelFromSafeZone();
-            }
+            if(this.isInStartZone() || this.isInFinishZone()) this.repelFromSafeZone();
         }
-        
-        isInStartZone() {
-            return (this.x + this.radius > startZone.x && this.x - this.radius < startZone.x + startZone.w &&
-                    this.y + this.radius > startZone.y && this.y - this.radius < startZone.y + startZone.h);
-        }
-        
-        isInFinishZone() {
-            return (this.x + this.radius > goal.x && this.x - this.radius < goal.x + goal.w &&
-                    this.y + this.radius > goal.y && this.y - this.radius < goal.y + goal.h);
-        }
-        
+        isInStartZone() { return (this.x + this.radius > startZone.x && this.x - this.radius < startZone.x + startZone.w && this.y + this.radius > startZone.y && this.y - this.radius < startZone.y + startZone.h); }
+        isInFinishZone() { return (this.x + this.radius > goal.x && this.x - this.radius < goal.x + goal.w && this.y + this.radius > goal.y && this.y - this.radius < goal.y + goal.h); }
         repelFromSafeZone() {
             if(this.isInStartZone()) {
-                const centerX = startZone.x + startZone.w/2;
-                const centerY = startZone.y + startZone.h/2;
+                const centerX = startZone.x + startZone.w/2, centerY = startZone.y + startZone.h/2;
                 const angle = Math.atan2(this.y - centerY, this.x - centerX);
-                this.x = startZone.x + startZone.w/2 + Math.cos(angle) * (Math.max(startZone.w, startZone.h) / 2 + this.radius + 5);
-                this.y = startZone.y + startZone.h/2 + Math.sin(angle) * (Math.max(startZone.w, startZone.h) / 2 + this.radius + 5);
+                this.x = centerX + Math.cos(angle) * (Math.max(startZone.w, startZone.h) / 2 + this.radius + 5);
+                this.y = centerY + Math.sin(angle) * (Math.max(startZone.w, startZone.h) / 2 + this.radius + 5);
             }
             if(this.isInFinishZone()) {
-                const centerX = goal.x + goal.w/2;
-                const centerY = goal.y + goal.h/2;
+                const centerX = goal.x + goal.w/2, centerY = goal.y + goal.h/2;
                 const angle = Math.atan2(this.y - centerY, this.x - centerX);
-                this.x = goal.x + goal.w/2 + Math.cos(angle) * (Math.max(goal.w, goal.h) / 2 + this.radius + 5);
-                this.y = goal.y + goal.h/2 + Math.sin(angle) * (Math.max(goal.w, goal.h) / 2 + this.radius + 5);
+                this.x = centerX + Math.cos(angle) * (Math.max(goal.w, goal.h) / 2 + this.radius + 5);
+                this.y = centerY + Math.sin(angle) * (Math.max(goal.w, goal.h) / 2 + this.radius + 5);
             }
         }
-        
         draw() {
             ctx.save();
             ctx.translate(this.x, this.y);
             ctx.rotate(this.angle);
             ctx.shadowBlur = 8;
             ctx.shadowColor = '#0af';
-            
             if(jaguarReady && jaguarImg.complete) {
-                ctx.drawImage(jaguarImg, 
-                    -this.drawWidth/2, 
-                    -this.drawHeight/2, 
-                    this.drawWidth, 
-                    this.drawHeight
-                );
+                ctx.drawImage(jaguarImg, -this.drawWidth/2, -this.drawHeight/2, this.drawWidth, this.drawHeight);
             } else {
                 ctx.fillStyle = '#00bbff';
+                ctx.fillRect(-14, -30, 28, 60);
+                ctx.fillStyle = '#ffff44';
+                ctx.font = 'bold 16px monospace';
+                ctx.fillText('J', -5, 4);
+            }
+            ctx.restore();
+        }
+    }
+    
+    class PatternEnemy {
+        constructor(patternType, patternParams, index, totalCount) {
+            this.radius = 22;
+            this.angle = 0;
+            this.patternType = patternType;
+            this.params = patternParams;
+            this.index = index;
+            this.totalCount = totalCount;
+            this.offset = (index / totalCount) * Math.PI * 2;
+            this.drawWidth = 32; this.drawHeight = 56;
+            this.x = 0; this.y = 0;
+        }
+        update(currentTime, canvasW, canvasH) {
+            const t = currentTime * (this.params.speed || 1.5);
+            const centerX = canvasW/2;
+            const centerY = canvasH/2;
+            const minX = startZone.x + startZone.w + 20;
+            const maxX = goal.x - 20;
+            const minY = 50;
+            const maxY = canvasH - 50;
+            const fieldWidth = maxX - minX;
+            const fieldHeight = maxY - minY;
+            
+            if(this.patternType === 'diagonal_wall') {
+                const wallCount = 6;
+                const spacing = fieldHeight / wallCount;
+                const wallIndex = this.index % wallCount;
+                const direction = Math.floor(this.index / wallCount) % 2 === 0 ? 1 : -1;
+                this.x = minX + (Math.sin(t * 1.3 + wallIndex) * 0.5 + 0.5) * fieldWidth;
+                this.y = minY + wallIndex * spacing + Math.sin(t * 1.8 + direction * 2) * 80;
+                this.angle = t;
+            }
+            else if(this.patternType === 'radial_burst') {
+                const rays = 10;
+                const rayAngle = (this.index % rays) * (Math.PI * 2 / rays);
+                const distance = (Math.sin(t * 1.6 + this.index) * 0.6 + 0.5) * Math.min(fieldWidth, fieldHeight) / 1.5;
+                this.x = centerX + Math.cos(rayAngle) * distance;
+                this.y = centerY + Math.sin(rayAngle) * distance;
+                this.angle = rayAngle + t;
+            }
+            else if(this.patternType === 'square_grid') {
+                const cols = 4;
+                const rows = 4;
+                const cellW = fieldWidth / cols;
+                const cellH = fieldHeight / rows;
+                const col = this.index % cols;
+                const row = Math.floor(this.index / cols) % rows;
+                this.x = minX + col * cellW + cellW/2 + Math.sin(t * 1.4 + this.offset) * 70;
+                this.y = minY + row * cellH + cellH/2 + Math.cos(t * 1.6 + this.offset) * 60;
+                this.angle = t;
+            }
+            else if(this.patternType === 'wave_grid') {
+                const waves = 5;
+                const spacingX = fieldWidth / waves;
+                const waveIndex = this.index % waves;
+                const offsetY = Math.floor(this.index / waves) * 70;
+                this.x = minX + waveIndex * spacingX + Math.sin(t * 1.5) * 100;
+                this.y = minY + offsetY + Math.sin(t * 2.2 + waveIndex) * 80;
+                this.angle = this.x * 0.01;
+            }
+            
+            this.x = Math.max(this.radius + 10, Math.min(canvasW - this.radius - 10, this.x));
+            this.y = Math.max(this.radius + 10, Math.min(canvasH - this.radius - 10, this.y));
+            
+            if((this.x + this.radius > startZone.x && this.x - this.radius < startZone.x + startZone.w &&
+                this.y + this.radius > startZone.y && this.y - this.radius < startZone.y + startZone.h) ||
+               (this.x + this.radius > goal.x && this.x - this.radius < goal.x + goal.w &&
+                this.y + this.radius > goal.y && this.y - this.radius < goal.y + goal.h)) {
+                this.x = centerX + (this.x - centerX) * 1.5;
+                this.y = centerY + (this.y - centerY) * 1.5;
+            }
+        }
+        draw() {
+            ctx.save();
+            ctx.translate(this.x, this.y);
+            ctx.rotate(this.angle);
+            ctx.shadowBlur = 8;
+            ctx.shadowColor = '#ff00ff';
+            if(jaguarReady && jaguarImg.complete) {
+                ctx.drawImage(jaguarImg, -this.drawWidth/2, -this.drawHeight/2, this.drawWidth, this.drawHeight);
+            } else {
+                ctx.fillStyle = '#ff44ff';
                 ctx.fillRect(-14, -30, 28, 60);
                 ctx.fillStyle = '#ffff44';
                 ctx.font = 'bold 16px monospace';
@@ -760,57 +1451,71 @@
     
     // ======================== УРОВНИ ========================
     const levels = [
-        { name: 'РАЗОГРЕВ',      enemyCount: 8,  speedBase: 2.7, speedVariation: 1.2 },
-        { name: 'ПОДВАЛЬНЫЙ RAVE', enemyCount: 12, speedBase: 3.5, speedVariation: 1.6 },
-        { name: 'JAGUAR STORM',  enemyCount: 18, speedBase: 4.4, speedVariation: 2.0 },
-        { name: 'HARDBASS HELL', enemyCount: 25, speedBase: 5.3, speedVariation: 2.2 },
-        { name: 'НЕОНОВАЯ ТУСА', enemyCount: 35, speedBase: 6.2, speedVariation: 2.5 },
-        { name: 'ФИНАЛЬНЫЙ ОТЖИГ', enemyCount: 50, speedBase: 7.5, speedVariation: 3.0 }
+        { name: 'РАЗОГРЕВ', enemyCount: 8, speedBase: 2.7, speedVariation: 1.2, isPattern: false },
+        { name: 'ПОДВАЛЬНЫЙ RAVE', enemyCount: 12, speedBase: 3.5, speedVariation: 1.6, isPattern: false },
+        { name: 'JAGUAR STORM', enemyCount: 18, speedBase: 4.4, speedVariation: 2.0, isPattern: false },
+        { name: 'HARDBASS HELL', enemyCount: 22, speedBase: 5.0, speedVariation: 2.2, isPattern: false },
+        { name: '🔲 ДИАГОНАЛЬНЫЕ СТЕНЫ', isPattern: true, patternType: 'diagonal_wall', patternParams: { speed: 1.5 }, enemyCount: 18 },
+        { name: '💥 РАДИАЛЬНЫЙ ВЗРЫВ', isPattern: true, patternType: 'radial_burst', patternParams: { speed: 1.6 }, enemyCount: 20 },
+        { name: '🟩 КВАДРАТНАЯ СЕТКА', isPattern: true, patternType: 'square_grid', patternParams: { speed: 1.4 }, enemyCount: 24 },
+        { name: '🌊 ВОЛНОВАЯ СЕТКА', isPattern: true, patternType: 'wave_grid', patternParams: { speed: 1.5 }, enemyCount: 25 }
     ];
-    
-    let enemies = [];
     
     function createLevel(levelIndex) {
         enemies = [];
+        patternEnemies = [];
         const lvl = levels[levelIndex];
-        for(let i=0; i<lvl.enemyCount; i++) {
-            let side = Math.floor(Math.random() * 4);
-            let x, y;
-            if(side === 0) { x = Math.random() * canvasW; y = -40; }
-            else if(side === 1) { x = canvasW + 40; y = Math.random() * canvasH; }
-            else if(side === 2) { x = Math.random() * canvasW; y = canvasH + 40; }
-            else { x = -40; y = Math.random() * canvasH; }
-            
-            const speedVal = lvl.speedBase + (Math.random() * lvl.speedVariation);
-            const angleDir = Math.random() * Math.PI * 2;
-            let vx = Math.cos(angleDir) * speedVal;
-            let vy = Math.sin(angleDir) * speedVal;
-            if(Math.random() > 0.6) {
-                vx = (Math.random() - 0.5) * speedVal * 1.8;
-                vy = (Math.random() - 0.5) * speedVal * 1.8;
+        
+        if(lvl.isPattern) {
+            isPatternLevel = true;
+            for(let i = 0; i < lvl.enemyCount; i++) {
+                patternEnemies.push(new PatternEnemy(lvl.patternType, lvl.patternParams, i, lvl.enemyCount));
             }
-            
-            const enemy = new JaguarBottle(x, y, vx, vy, 22);
-            enemies.push(enemy);
+        } else {
+            isPatternLevel = false;
+            for(let i = 0; i < lvl.enemyCount; i++) {
+                let side = Math.floor(Math.random() * 4);
+                let x, y;
+                if(side === 0) { x = Math.random() * canvasW; y = -40; }
+                else if(side === 1) { x = canvasW + 40; y = Math.random() * canvasH; }
+                else if(side === 2) { x = Math.random() * canvasW; y = canvasH + 40; }
+                else { x = -40; y = Math.random() * canvasH; }
+                const speedVal = lvl.speedBase + (Math.random() * lvl.speedVariation);
+                const angleDir = Math.random() * Math.PI * 2;
+                let vx = Math.cos(angleDir) * speedVal;
+                let vy = Math.sin(angleDir) * speedVal;
+                if(Math.random() > 0.6) { vx = (Math.random() - 0.5) * speedVal * 1.8; vy = (Math.random() - 0.5) * speedVal * 1.8; }
+                enemies.push(new JaguarBottle(x, y, vx, vy, 22));
+            }
         }
+        spawnCoinsForLevel();
+        // Инициализируем частицы эффекта
+        initEffectParticles();
     }
     
     function resetPlayerPosition() {
-        player.x = 80;
-        player.y = canvasH / 2;
-        player.x = Math.min(Math.max(player.x, 0), canvasW - player.size);
-        player.y = Math.min(Math.max(player.y, 0), canvasH - player.size);
+        playerObj.x = startZone.x + startZone.w/2;
+        playerObj.y = canvasH / 2;
+        playerObj.x = Math.min(Math.max(playerObj.x, 0), canvasW - playerObj.size);
+        playerObj.y = Math.min(Math.max(playerObj.y, 0), canvasH - playerObj.size);
     }
+    
+    function showDeathMenu() {
+        stopMusic();
+        document.getElementById('deathPanel').style.display = 'block';
+        gameRunning = false;
+        gamePaused = true;
+    }
+    
+    function hideDeathMenu() { document.getElementById('deathPanel').style.display = 'none'; }
     
     function triggerDeath() {
         if(!gameRunning) return;
         playHitSound();
-        gameRunning = false;
-        gamePaused = true;
         totalDeaths++;
         updateUI();
         screenShake = 22;
-        document.getElementById('deathPanel').style.display = 'block';
+        showDeathMenu();
     }
     
     function restartGame() {
@@ -822,31 +1527,58 @@
         time = 0;
         screenShake = 0;
         updateUI();
-        document.getElementById('deathPanel').style.display = 'none';
+        hideDeathMenu();
+        startMusic();
     }
     
-    function checkCollision(playerRect, enemy) {
-        const playerCenterX = playerRect.x + playerRect.size/2;
-        const playerCenterY = playerRect.y + playerRect.size/2;
-        const dx = playerCenterX - enemy.x;
-        const dy = playerCenterY - enemy.y;
-        const dist = Math.hypot(dx, dy);
-        const threshold = enemy.radius + playerRect.size/2 - 4;
-        return dist < threshold;
+    function exitToMenu() {
+        stopMusic();
+        hideDeathMenu();
+        document.getElementById('vhsMenu').style.display = 'flex';
+        gameRunning = false;
+        gamePaused = true;
+        updateCoinsDisplay();
+    }
+    
+    function checkCollision() {
+        const playerCenterX = playerObj.x + playerObj.size/2;
+        const playerCenterY = playerObj.y + playerObj.size/2;
+        
+        if(isPatternLevel) {
+            for(let enemy of patternEnemies) {
+                const dx = playerCenterX - enemy.x, dy = playerCenterY - enemy.y;
+                if(Math.hypot(dx, dy) < enemy.radius + playerObj.size/2 - 4) { triggerDeath(); return true; }
+            }
+        } else {
+            for(let enemy of enemies) {
+                const dx = playerCenterX - enemy.x, dy = playerCenterY - enemy.y;
+                if(Math.hypot(dx, dy) < enemy.radius + playerObj.size/2 - 4) { triggerDeath(); return true; }
+            }
+        }
+        return false;
+    }
+    
+    function checkCoinCollision() {
+        for(let coin of coins) {
+            if(coin.checkCollision(playerObj.x, playerObj.y, playerObj.size)) saveGame();
+        }
     }
     
     function isWinCondition() {
-        return (player.x < goal.x + goal.w && player.x + player.size > goal.x &&
-                player.y < goal.y + goal.h && player.y + player.size > goal.y);
+        return (playerObj.x < goal.x + goal.w && playerObj.x + playerObj.size > goal.x &&
+                playerObj.y < goal.y + goal.h && playerObj.y + playerObj.size > goal.y);
     }
     
     function nextLevel() {
         if(currentLevelIdx + 1 >= levels.length) {
-            addStats(currentPlayerName, totalDeaths, currentLevelIdx + 1);
+            saveData.playersStats.unshift({ name: saveData.playerName, deaths: totalDeaths, level: currentLevelIdx + 1, date: new Date().toLocaleString() });
+            if(saveData.playersStats.length > 20) saveData.playersStats.pop();
+            saveGame();
+            stopMusic();
             gameRunning = false;
             gamePaused = true;
-            alert(`🏆 ПОБЕДА! ${currentPlayerName} прошёл игру!\n💀 Всего попыток: ${totalDeaths}`);
-            document.getElementById('vhsMenu').classList.remove('hidden');
+            alert(`🏆 ПОБЕДА! ${saveData.playerName} прошёл игру!\n💀 Всего попыток: ${totalDeaths}`);
+            document.getElementById('vhsMenu').style.display = 'flex';
             return;
         }
         currentLevelIdx++;
@@ -858,134 +1590,343 @@
     
     function updateGame() {
         if(!gameRunning || gamePaused) return;
-        
         time += 0.018;
-        player.update();
+        playerObj.update();
         
-        for(let i=0; i<enemies.length; i++) {
-            const e = enemies[i];
-            e.update();
-            if(checkCollision(player, e)) {
-                triggerDeath();
-                return;
-            }
+        if(isPatternLevel) {
+            for(let enemy of patternEnemies) enemy.update(time, canvasW, canvasH);
+        } else {
+            for(let enemy of enemies) enemy.update();
         }
+        for(let coin of coins) coin.update();
         
-        if(isWinCondition()) {
-            nextLevel();
-        }
+        checkCoinCollision();
+        if(checkCollision()) return;
+        if(isWinCondition()) nextLevel();
+        
+        // Обновляем эффекты
+        updateEffectParticles();
     }
     
     function renderScene() {
-        ctx.clearRect(0, 0, canvasW, canvasH);
+        const currentTheme = getCurrentTheme();
         
-        ctx.fillStyle = '#111';
+        ctx.clearRect(0, 0, canvasW, canvasH);
+        ctx.fillStyle = currentTheme.style.bg;
         ctx.fillRect(0, 0, canvasW, canvasH);
         
         for(let i = 0; i < canvasW; i+= 48) {
             ctx.beginPath();
-            ctx.strokeStyle = 'rgba(0, 255, 255, 0.15)';
+            ctx.strokeStyle = currentTheme.style.gridColor;
             ctx.lineWidth = 1;
-            ctx.moveTo(i, 0);
-            ctx.lineTo(i, canvasH);
-            ctx.stroke();
-            ctx.moveTo(0, i);
-            ctx.lineTo(canvasW, i);
-            ctx.stroke();
+            ctx.moveTo(i, 0); ctx.lineTo(i, canvasH); ctx.stroke();
+            ctx.moveTo(0, i); ctx.lineTo(canvasW, i); ctx.stroke();
         }
         
         ctx.fillStyle = 'rgba(0, 255, 0, 0.25)';
         ctx.fillRect(startZone.x, startZone.y, startZone.w, startZone.h);
-        ctx.fillStyle = 'rgba(0, 255, 0, 0.5)';
-        ctx.fillRect(0, canvasH/2 - 100, 140, 200);
         ctx.fillStyle = '#00ff00';
-        ctx.font = 'bold 20px "Courier New", monospace';
-        ctx.shadowBlur = 0;
-        ctx.fillText("СТАРТ", 30, canvasH/2 - 110);
+        ctx.font = 'bold 20px monospace';
+        ctx.fillText("СТАРТ", startZone.x + 40, startZone.y + 40);
         
         ctx.fillStyle = 'rgba(0, 255, 0, 0.4)';
         ctx.fillRect(goal.x, goal.y, goal.w, goal.h);
         ctx.fillStyle = '#00ff00';
-        ctx.font = 'bold 20px "Courier New", monospace';
-        ctx.fillText("ФИНИШ", goal.x + 5, goal.y - 10);
+        ctx.fillText("ФИНИШ", goal.x + 15, goal.y - 10);
         
-        enemies.forEach(e => e.draw());
-        player.draw();
+        if(isPatternLevel) {
+            for(let enemy of patternEnemies) enemy.draw();
+        } else {
+            for(let enemy of enemies) enemy.draw();
+        }
+        for(let coin of coins) coin.draw();
+        
+        // Рисуем эффекты ПОД игроком (чтобы не перекрывали)
+        drawEffectParticles();
+        
+        playerObj.draw();
         
         ctx.font = 'bold 14px monospace';
         ctx.fillStyle = '#ff44ff';
-        ctx.fillText(`${currentPlayerName}`, canvasW-150, 40);
+        ctx.fillText(`${saveData.playerName}`, canvasW-150, 40);
         ctx.fillStyle = '#0ff';
-        ctx.fillText(`${levels[currentLevelIdx].name}`, canvasW-250, 70);
+        ctx.fillText(`${levels[currentLevelIdx].name}`, canvasW-320, 70);
     }
     
-    // ======================== УПРАВЛЕНИЕ ========================
-    const keys = {};
-    window.addEventListener('keydown', (e) => {
-        const key = e.key;
-        keys[key] = true;
+    // ======================== МЕНЮ ========================
+    let currentShopTab = "skins";
+
+    function renderShop() {
+        const container = document.getElementById('shopList');
+        if(!container) return;
+        container.innerHTML = '';
         
-        if(key === 'r' || key === 'R') {
-            e.preventDefault();
-            if(!gameRunning && gamePaused) {
-                restartGame();
+        if(currentShopTab === "skins") {
+            for(let skin of SKINS) {
+                const owned = saveData.ownedSkins.includes(skin.id);
+                const selected = saveData.currentSkin === skin.id;
+                const canBuy = !owned && saveData.coins >= skin.price;
+                
+                const div = document.createElement('div');
+                div.className = 'shop-item';
+                
+                const previewDiv = document.createElement('div');
+                previewDiv.className = 'shop-preview';
+                if(skinPreviews[skin.id]) previewDiv.appendChild(skinPreviews[skin.id]);
+                else {
+                    const fbCanvas = document.createElement('canvas');
+                    fbCanvas.width = 60; fbCanvas.height = 60;
+                    const pCtx = fbCanvas.getContext('2d');
+                    pCtx.fillStyle = '#ff00ff'; pCtx.fillRect(0, 0, 60, 60);
+                    pCtx.fillStyle = '#fff'; pCtx.font = 'bold 10px monospace';
+                    pCtx.fillText(skin.name.substring(0,4), 12, 30);
+                    previewDiv.appendChild(fbCanvas);
+                }
+                
+                const infoDiv = document.createElement('div');
+                infoDiv.className = 'shop-info';
+                infoDiv.innerHTML = `<div class="shop-name">${skin.name}</div><div class="shop-price">${skin.price === 0 ? 'БЕСПЛАТНО' : skin.price + ' монет'}</div>`;
+                
+                const actionDiv = document.createElement('div');
+                actionDiv.className = 'shop-action';
+                
+                if(selected) {
+                    const btn = document.createElement('button');
+                    btn.innerHTML = '✅ ВЫБРАН';
+                    btn.disabled = true;
+                    actionDiv.appendChild(btn);
+                } else if(owned) {
+                    const btn = document.createElement('button');
+                    btn.innerHTML = '⭐ ВЫБРАТЬ';
+                    btn.onclick = () => { selectSkin(skin.id); renderShop(); };
+                    actionDiv.appendChild(btn);
+                } else {
+                    const btn = document.createElement('button');
+                    btn.innerHTML = `💰 КУПИТЬ (${skin.price})`;
+                    btn.disabled = !canBuy;
+                    btn.onclick = () => { if(buySkin(skin.id)) renderShop(); };
+                    actionDiv.appendChild(btn);
+                }
+                
+                div.appendChild(previewDiv);
+                div.appendChild(infoDiv);
+                div.appendChild(actionDiv);
+                container.appendChild(div);
+            }
+        } else if(currentShopTab === "dancefloor") {
+            for(let theme of THEMES) {
+                const owned = saveData.ownedThemes.includes(theme.id);
+                const selected = saveData.currentTheme === theme.id;
+                const canBuy = !owned && saveData.coins >= theme.price;
+                
+                const div = document.createElement('div');
+                div.className = 'shop-item';
+                
+                const previewDiv = document.createElement('div');
+                previewDiv.className = 'shop-preview';
+                const previewCanvas = document.createElement('canvas');
+                previewCanvas.width = 60;
+                previewCanvas.height = 60;
+                const pCtx = previewCanvas.getContext('2d');
+                pCtx.fillStyle = theme.style.bg;
+                pCtx.fillRect(0, 0, 60, 60);
+                pCtx.strokeStyle = '#ff00ff';
+                pCtx.strokeRect(2, 2, 56, 56);
+                for(let i = 0; i < 60; i+= 12) {
+                    pCtx.strokeStyle = theme.style.gridColor;
+                    pCtx.beginPath();
+                    pCtx.moveTo(i, 0);
+                    pCtx.lineTo(i, 60);
+                    pCtx.stroke();
+                    pCtx.moveTo(0, i);
+                    pCtx.lineTo(60, i);
+                    pCtx.stroke();
+                }
+                previewDiv.appendChild(previewCanvas);
+                
+                const infoDiv = document.createElement('div');
+                infoDiv.className = 'shop-info';
+                infoDiv.innerHTML = `<div class="shop-name">${theme.name}</div><div class="shop-price">${theme.price === 0 ? 'БЕСПЛАТНО' : theme.price + ' монет'}</div>`;
+                
+                const actionDiv = document.createElement('div');
+                actionDiv.className = 'shop-action';
+                
+                if(selected) {
+                    const btn = document.createElement('button');
+                    btn.innerHTML = '✅ ВЫБРАНА';
+                    btn.disabled = true;
+                    actionDiv.appendChild(btn);
+                } else if(owned) {
+                    const btn = document.createElement('button');
+                    btn.innerHTML = '⭐ ВЫБРАТЬ';
+                    btn.onclick = () => { selectTheme(theme.id); renderShop(); };
+                    actionDiv.appendChild(btn);
+                } else {
+                    const btn = document.createElement('button');
+                    btn.innerHTML = `💰 КУПИТЬ (${theme.price})`;
+                    btn.disabled = !canBuy;
+                    btn.onclick = () => { if(buyTheme(theme.id)) renderShop(); };
+                    actionDiv.appendChild(btn);
+                }
+                
+                div.appendChild(previewDiv);
+                div.appendChild(infoDiv);
+                div.appendChild(actionDiv);
+                container.appendChild(div);
+            }
+        } else if(currentShopTab === "atmosphere") {
+            for(let effect of EFFECTS) {
+                const owned = saveData.ownedEffects.includes(effect.id);
+                const selected = saveData.currentEffect === effect.id;
+                const canBuy = !owned && saveData.coins >= effect.price;
+                
+                const div = document.createElement('div');
+                div.className = 'shop-item';
+                
+                const previewDiv = document.createElement('div');
+                previewDiv.className = 'shop-preview';
+                const previewCanvas = document.createElement('canvas');
+                previewCanvas.width = 60;
+                previewCanvas.height = 60;
+                const pCtx = previewCanvas.getContext('2d');
+                pCtx.fillStyle = '#111';
+                pCtx.fillRect(0, 0, 60, 60);
+                // Символ эффекта
+                pCtx.fillStyle = '#ff00ff';
+                pCtx.font = '28px monospace';
+                pCtx.fillText(effect.id === "none" ? "⬜" : effect.id === "sparks" ? "✨" : effect.id === "glow" ? "💫" : effect.id === "stars" ? "🌟" : effect.id === "fire" ? "🔥" : "💜", 12, 42);
+                previewDiv.appendChild(previewCanvas);
+                
+                const infoDiv = document.createElement('div');
+                infoDiv.className = 'shop-info';
+                infoDiv.innerHTML = `<div class="shop-name">${effect.name}</div><div class="shop-price">${effect.price === 0 ? 'БЕСПЛАТНО' : effect.price + ' монет'}</div><div style="font-size:11px;color:#888;">${effect.desc}</div>`;
+                
+                const actionDiv = document.createElement('div');
+                actionDiv.className = 'shop-action';
+                
+                if(selected) {
+                    const btn = document.createElement('button');
+                    btn.innerHTML = '✅ ВЫБРАН';
+                    btn.disabled = true;
+                    actionDiv.appendChild(btn);
+                } else if(owned) {
+                    const btn = document.createElement('button');
+                    btn.innerHTML = '⭐ ВЫБРАТЬ';
+                    btn.onclick = () => { selectEffect(effect.id); renderShop(); };
+                    actionDiv.appendChild(btn);
+                } else {
+                    const btn = document.createElement('button');
+                    btn.innerHTML = `💰 КУПИТЬ (${effect.price})`;
+                    btn.disabled = !canBuy;
+                    btn.onclick = () => { if(buyEffect(effect.id)) renderShop(); };
+                    actionDiv.appendChild(btn);
+                }
+                
+                div.appendChild(previewDiv);
+                div.appendChild(infoDiv);
+                div.appendChild(actionDiv);
+                container.appendChild(div);
             }
         }
-        
-        if(key === 'ArrowUp' || key === 'ArrowDown' || key === ' ' || key === 'Space') {
-            e.preventDefault();
-        }
-    });
+    }
+
+    function switchShopTab(tabId) {
+        currentShopTab = tabId;
+        document.querySelectorAll('.shop-tab').forEach(tab => {
+            if(tab.dataset.tab === tabId) {
+                tab.classList.add('active');
+            } else {
+                tab.classList.remove('active');
+            }
+        });
+        renderShop();
+    }
     
-    window.addEventListener('keyup', (e) => {
-        const key = e.key;
-        keys[key] = false;
-    });
+    window.openShop = function() {
+        document.getElementById('menuMain').style.display = 'none';
+        document.getElementById('menuShop').style.display = 'block';
+        document.querySelectorAll('.shop-tab').forEach(tab => {
+            tab.onclick = () => switchShopTab(tab.dataset.tab);
+        });
+        switchShopTab(currentShopTab);
+    };
+    
+    window.closeShop = function() {
+        document.getElementById('menuMain').style.display = 'block';
+        document.getElementById('menuShop').style.display = 'none';
+        updateCoinsDisplay();
+    };
+    
+    window.showGame = function() {
+        const nameInput = document.getElementById('playerName');
+        if(nameInput.value.trim()) saveData.playerName = nameInput.value.trim().toUpperCase();
+        saveGame();
+        document.getElementById('vhsMenu').style.display = 'none';
+        gameRunning = true;
+        gamePaused = false;
+        totalDeaths = 0;
+        currentLevelIdx = 0;
+        createLevel(0);
+        resetPlayerPosition();
+        time = 0;
+        updateUI();
+        startMusic();
+    };
+    
+    window.showStats = function() {
+        document.getElementById('menuMain').style.display = 'none';
+        document.getElementById('menuStats').style.display = 'block';
+        const statsDiv = document.getElementById('statsList');
+        if(saveData.playersStats.length === 0) statsDiv.innerHTML = '<div class="stat-item">📭 НЕТ ДАННЫХ</div>';
+        else statsDiv.innerHTML = saveData.playersStats.map(s => `<div class="stat-item">🎮 ${s.name} | 💀 ${s.deaths} | 🌍 ${s.level} ур. | ${s.date}</div>`).join('');
+    };
+    
+    window.showSettings = function() {
+        document.getElementById('menuMain').style.display = 'none';
+        document.getElementById('menuSettings').style.display = 'block';
+        document.getElementById('nextTrackBtn').onclick = () => nextTrack();
+    };
+    
+    window.backToMain = function() {
+        document.getElementById('menuMain').style.display = 'block';
+        document.getElementById('menuStats').style.display = 'none';
+        document.getElementById('menuSettings').style.display = 'none';
+        document.getElementById('menuShop').style.display = 'none';
+        updateCoinsDisplay();
+    };
+    
+    window.exitGame = function() { stopMusic(); window.close(); alert('Закройте вкладку браузера'); };
     
     function gameLoop() {
         updateGame();
-        
         ctx.save();
         if(screenShake > 0) {
-            const shakeX = (Math.random() - 0.5) * screenShake;
-            const shakeY = (Math.random() - 0.5) * screenShake;
-            ctx.translate(shakeX, shakeY);
+            ctx.translate((Math.random()-0.5)*screenShake, (Math.random()-0.5)*screenShake);
             screenShake *= 0.86;
             if(screenShake < 0.5) screenShake = 0;
         }
         renderScene();
         ctx.restore();
-        
         requestAnimationFrame(gameLoop);
     }
     
-    window.addEventListener('resize', () => {
-        resizeCanvas();
-    });
+    window.addEventListener('resize', () => { resizeCanvas(); if(gameRunning) createLevel(currentLevelIdx); });
+    canvas.addEventListener('click', () => { if(!musicStarted && gameRunning && !gamePaused) startMusic(); });
     
-    canvas.addEventListener('click', () => {
-        if(!musicStarted && playlist.length > 0) {
-            startMusic();
-        }
-    });
-    
-    setSoundVolume(soundVolume * 100);
-    setMusicVolume(musicVolume);
+    // Запуск игры
+    initCloudSaves();
     
     resizeCanvas();
     updateGoalPosition();
     createLevel(0);
     updateUI();
+    loadAllSkins();
     gameLoop();
-    
     canvas.addEventListener('contextmenu', (e) => e.preventDefault());
     
-    // Обновляем информацию о треке в фоне
     setInterval(() => {
-        if(currentAudio && !currentAudio.paused && musicStarted && playlist[currentTrackIndex]) {
-            const track = playlist[currentTrackIndex];
-            const trackInfo = document.getElementById('trackInfo');
-            trackInfo.innerHTML = `🎵 ${track.name} | 🎧 ГРОМК.: ${Math.round(musicVolume * 100)}% | 🔊 ЭФФ.: ${Math.round(soundVolume * 100)}%`;
+        if(currentAudio && !currentAudio.paused && musicStarted && playlist[currentTrackIndex] && gameRunning && !gamePaused) {
+            document.getElementById('trackInfo').innerHTML = `🎵 ${playlist[currentTrackIndex].name} | 🎧 ${Math.round(saveData.musicVolume*100)}% | 🔊 ${Math.round(saveData.soundVolume*100)}%`;
         }
     }, 1000);
 </script>
