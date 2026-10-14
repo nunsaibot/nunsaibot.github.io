@@ -1,0 +1,11 @@
+{
+  "name": "kage-blood-moon",
+  "version": "0.3.0",
+  "private": true,
+  "description": "A dependency-free voxel ninja platformer",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test tests/engine.test.js tests/campaign.test.js tests/kitchen.test.js tests/ai.test.js",
+    "check": "node --check engine.js && node --check campaign.js && node --check hub.js && node --check game.js && node --check kitchen-core.js && node --check kitchen-ui.js && node --check server.js"
+  }
+}
