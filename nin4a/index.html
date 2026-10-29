@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0c1019">
+  <meta name="description" content="Бусидо — воксельный платформер о ниндзя. 24 миссии, восемь районов и восемь уникальных боссов.">
+  <title>Бусидо — Кровавая луна</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="hub.css">
+  <link rel="stylesheet" href="work.css">
+</head>
+<body>
+  <main id="app">
+    <svg class="icon-defs" aria-hidden="true"><defs><symbol id="chaire-icon" viewBox="0 0 24 28"><path d="M6 7h12l2 6v10c0 2-16 2-16 0V13l2-6ZM5 7h14V4H5ZM8 4V2h8v2M4 13c4 2 12 2 16 0M8 19h8M8 23h8"/></symbol></defs></svg>
+    <canvas id="game" aria-label="Игровое поле: Бусидо" tabindex="0"></canvas>
+    <div class="vignette" aria-hidden="true"></div>
+    <header class="topbar">
+      <a class="brand" href="#" id="brand" aria-label="Бусидо — меню"><span class="brand-mark">影</span><span>БУСИДО<span class="brand-dot">.</span></span></a>
+      <div class="top-actions">
+        <span class="build-label"><span id="top-day-label">ДЕНЬ 01</span></span>
+        <div class="wallet" id="wallet" aria-label="Баланс: 0 тяирэ"><svg class="cup-icon" aria-hidden="true"><use href="#chaire-icon"/></svg><strong data-balance>0</strong><span>ТЯИРЭ</span></div>
+        <button class="icon-button" id="audio-button" title="Включить звук" aria-label="Включить звук" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5Z"/><path class="sound-waves" d="M15 8c2 2 2 6 0 8m3-11c4 4 4 10 0 14"/><path class="sound-off" d="m16 9 5 6m0-6-5 6"/></svg></button>
+        <button class="icon-button hidden" id="pause-button" title="Пауза · Esc" aria-label="Пауза"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14M16 5v14"/></svg></button>
+      </div>
+    </header>
+
+    <section class="screen menu-screen" id="menu-screen" aria-labelledby="game-title">
+      <div class="menu-content">
+        <div class="eyebrow"><span class="red-line"></span> ТЕНЬ НЕ ОСТАВЛЯЕТ СЛЕДОВ</div>
+        <h1 id="game-title">БУСИДО<span class="title-dot">.</span></h1>
+        <div class="subtitle">К Р О В А В А Я &nbsp; Л У Н А</div>
+        <p class="intro">Днём — суши-бар. Ночью — набег.<br>Начни с кулаков. Заслужи свой клинок.</p>
+        <button class="primary-button" id="start-button"><span id="start-label">НАЧАТЬ ДЕНЬ</span><span class="button-arrow">↗</span></button>
+        <p class="menu-day-status" id="menu-day-status"></p><button class="secondary-button menu-shop" id="menu-shop-button">МАГАЗИН <span>→</span></button>
+        <button class="text-button hidden" data-skip-work>ПРОПУСТИТЬ СМЕНУ ПО ГРАМОТЕ</button>
+        <button class="secondary-button menu-okusan" id="okusan-button">Пойти к Окусан <span>→</span></button>
+        <div class="menu-meta"><span class="status-dot"></span> 24 МИССИИ <span class="meta-divider">/</span> 8 БОССОВ</div>
+      </div>
+      <div class="vertical-type" aria-hidden="true">影<br><span>の</span><br>刃</div>
+      <div class="scene-caption"><span>01 — СТАРЫЙ КВАРТАЛ</span><span>23:48 &nbsp; / &nbsp; ДОЖДЬ</span></div>
+      <footer class="menu-footer"><div class="genre-tag"><span>刀</span> VOXEL ACTION PLATFORMER</div><button class="text-button" id="blood-button">КРОВЬ: <strong>МНОГО</strong> <span>↔</span></button><span class="footer-note">СДЕЛАНО ИЗ КУБОВ. И ЯРОСТИ.</span></footer>
+    </section>
+
+
+
+    <section class="screen courtyard-screen hidden" id="courtyard-screen" aria-label="Дворик Окусан">
+      <div class="courtyard-heading"><div><div class="eyebrow">ЗДЕСЬ МОЖНО ОПУСТИТЬ КЛИНОК</div><h2>Тёплый свет дома<span>.</span></h2></div><button class="text-button" id="courtyard-menu">← ГЛАВНАЯ</button></div>
+      <div class="courtyard-stage"><canvas id="courtyard-canvas" tabindex="0" aria-label="Дворик. A и D — идти. E — подойти и поговорить с Окусан."></canvas><button id="okusan-person" aria-label="Поговорить с Окусан" title="Окусан"></button></div>
+      <div class="courtyard-controls"><div><button data-yard-move="KeyA" aria-label="Идти влево">←</button><button data-yard-move="KeyD" aria-label="Идти вправо">→</button></div><span>A / D — идти · E — разговор<br>Можно нажать на дорожку или на Окусан.</span><button id="courtyard-talk" class="secondary-button">Подойти к Окусан</button></div>
+      <div class="okusan-dialog hidden" id="okusan-dialog" role="dialog" aria-modal="true" aria-labelledby="okusan-title"><div class="eyebrow">У КРЫЛЬЦА</div><h3 id="okusan-title">Окусан</h3><p id="okusan-response" aria-live="polite"></p><button id="okusan-offer" class="primary-button">Попросить прощения (1 тяирэ)</button><button id="okusan-leave" class="text-button">Уйти</button></div>
+    </section>
+    <section class="screen work-screen hidden" id="work-screen" aria-label="Рабочая смена в суши-баре">
+      <div class="work-shell">
+        <div class="work-topline"><span><i></i> СУШИ-БАР «КОХАКУ» <b id="work-day">ДЕНЬ 01</b></span><div class="work-navigation"><button class="text-button hidden" data-skip-work>ПРОПУСТИТЬ СМЕНУ ПО ГРАМОТЕ</button><button class="text-button" id="work-shop-button">МАГАЗИН ↗</button><button class="text-button" id="work-back-button">← ГЛАВНАЯ</button></div></div>
+        <div class="work-heading"><div><div class="eyebrow">ДНЁМ ТЫ ДЕРЖИШЬ ДРУГОЙ НОЖ</div><h2 id="work-title">Разделка рыбы<span>.</span></h2></div><span class="order-badge" id="work-order">ОБЫЧНЫЙ ЗАКАЗ</span></div>
+        <div class="work-layout">
+          <div class="work-station">
+            <div class="work-meters"><div><span>КАЧЕСТВО</span><strong id="work-quality">100<small>%</small></strong></div><div class="work-progress-block"><span id="work-progress-label">ГОТОВО 0%</span><div class="work-track"><i id="work-progress"></i></div></div><button class="work-pause-button" id="work-pause-button" aria-label="Приостановить работу">Ⅱ</button></div>
+            <div class="work-canvas-wrap"><canvas id="work-canvas" width="1440" height="800" tabindex="0" aria-label="Мини-игра приготовления"></canvas><div class="work-start-overlay" id="work-start-overlay"><span class="work-stamp">仕</span><p id="work-start-hint">Проведи нож по светлой дорожке.</p><button class="primary-button" id="work-start-button">ПРИСТУПИТЬ К РАБОТЕ <span>→</span></button></div></div>
+            <div class="work-tools" id="fish-tools"><div class="knife-buttons"><button data-work-dir="left" aria-label="Нож влево">←</button><button data-work-dir="up" aria-label="Нож вверх">↑</button><button data-work-dir="down" aria-label="Нож вниз">↓</button><button data-work-dir="right" aria-label="Нож вправо">→</button></div><span>WASD / СТРЕЛКИ — ПОВОРОТ НОЖА</span></div>
+            <div class="work-tools hidden" id="rice-tools"><label for="heat-control">ОГОНЬ <b id="heat-value">45%</b><input type="range" id="heat-control" min="0" max="100" value="45" aria-label="Мощность огня"></label><button id="stir-button">ПОМЕШАТЬ <span>SPACE</span></button></div>
+            <div class="work-tools hidden" id="slice-tools"><button class="kitchen-action" id="slice-button">РЕЗАТЬ <span>SPACE</span></button><span>НАЖМИ, КОГДА МЕТКА В ЗЕЛЁНОЙ ЗОНЕ</span></div>
+            <div class="work-tools hidden" id="roll-tools"><button class="kitchen-action" id="roll-button" aria-pressed="false">ПРИЖАТЬ ЦИНОВКУ <span>УДЕРЖИВАЙ SPACE</span></button><span>ДЕРЖИ ДАВЛЕНИЕ В ЗЕЛЁНОЙ ЗОНЕ</span></div>
+            <div class="work-tools hidden order-tools" id="order-tools"><div class="ingredient-buttons" id="ingredient-buttons"></div><button class="replay-order" id="replay-order-button">ПОДСМОТРЕТЬ −8%</button></div>
+            <div class="work-status" id="work-status" role="status">Приготовь заказ, чтобы открыть карту набегов.</div>
+          </div>
+          <aside class="work-recipe">
+            <div id="work-instructions"><span class="recipe-index" id="recipe-index">01 / ПОДГОТОВКА РЫБЫ</span><h3 id="recipe-title">Ровная рука.<br>Чистый срез.</h3><p id="recipe-intro"></p><ol id="recipe-steps"></ol><div class="quality-goal"><span>НАГРАДА ЗА АККУРАТНОСТЬ</span><strong>80–100<small>%</small></strong><p>Один случайный баф на следующий набег. Ниже 80% — набег без бафа.</p></div><p class="work-rule">Закончи весь заказ. Только после смены можно отправиться на зачистку.</p></div>
+            <div id="work-completion" class="hidden"><div class="eyebrow">СМЕНА ЗАКОНЧЕНА</div><h3>Заказ принят<span>.</span></h3><p>Итоговое качество</p><strong class="final-quality" id="final-quality">100%</strong><div class="earned-buff" id="earned-buff"><span id="earned-buff-icon">心</span><div><strong id="earned-buff-name"></strong><p id="earned-buff-description"></p></div></div><p class="work-rule" id="work-buff-rule">Баф действует на один набег и расходуется при его завершении, смерти или выходе.</p><button class="primary-button" id="work-map-button">К КАРТЕ НАБЕГОВ <span>→</span></button></div>
+          </aside>
+        </div>
+        <div class="work-footer"><span>ДНЁМ — ТЕРПЕНИЕ. НОЧЬЮ — СКОРОСТЬ.</span><span id="work-save-note">Задание дня сохраняется при выходе.</span></div>
+      </div>
+    </section>
+
+    <section class="screen hub-screen hidden" id="hub-screen" aria-label="Карта набегов и оружейная">
+      <div class="hub-shell">
+        <nav class="hub-nav" aria-label="Подготовка к набегу">
+          <div class="hub-tabs"><button id="map-tab" class="hub-tab active" aria-current="page">КАРТА НАБЕГОВ</button><button id="shop-tab" class="hub-tab">ОРУЖЕЙНАЯ <span>09</span></button></div>
+          <button class="text-button" id="hub-menu-button">← ГЛАВНАЯ</button>
+        </nav>
+        <div id="map-pane">
+          <div class="hub-heading"><div><div class="eyebrow">ГОРОД НЕ СПИТ</div><h2>Выбери свою цель<span>.</span></h2></div><p>Три миссии открывают босса района.<br>Восемь боссов. <b>За победу — 3 тяирэ.</b></p></div>
+          <div class="day-brief"><span id="map-day">ДЕНЬ 01</span><span id="map-shift-status">Сначала рабочая смена</span><span id="map-buff">Без бафа</span></div>
+          <button class="text-button hidden" data-skip-work>ПРОПУСТИТЬ СМЕНУ ПО ГРАМОТЕ</button><div class="region-picker"><label for="region-select">ОБЛАСТЬ</label><select id="region-select"></select><span id="region-progress"></span></div>
+          <div class="raid-layout">
+            <div class="city-map" aria-label="Районы города">
+              <svg class="city-drawing" viewBox="0 0 800 480" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+                <defs><pattern id="map-grid" width="32" height="32" patternUnits="userSpaceOnUse"><path d="M32 0H0V32" fill="none" stroke="#53677a" stroke-opacity=".10"/></pattern><pattern id="map-blocks" width="95" height="82" patternUnits="userSpaceOnUse"><rect x="9" y="8" width="33" height="22" fill="#24303c"/><rect x="47" y="8" width="36" height="22" fill="#1e2c37"/><rect x="9" y="37" width="30" height="32" fill="#1e2c37"/><path d="M46 37h37v17H65v15H46Z" fill="#26313c"/></pattern></defs>
+                <rect width="800" height="480" fill="#121e2a"/><rect width="800" height="480" fill="url(#map-grid)"/>
+                <path d="M50 55h236v126h-68v210H47ZM345 38h317v150H532v151H340ZM578 265h187v180H472v-67h106Z" fill="url(#map-blocks)"/>
+                <path d="M304-20 318 142 274 219 313 292 258 506" fill="none" stroke="#182f3c" stroke-width="47"/><path d="M305-20 319 142 275 219 314 292 259 506" fill="none" stroke="#396070" stroke-opacity=".35" stroke-width="1"/>
+                <g fill="none" stroke="#6a7281" stroke-opacity=".24"><path d="M-20 221H245L370 194H820" stroke-width="15"/><path d="M103-10v158l51 68v272M469-20v145l73 98v285" stroke-width="11"/><path d="M-20 392h261l92-54h452M-10 80h287M355 90h490" stroke-width="8"/></g>
+                <g fill="none" stroke="#8795a4" stroke-opacity=".18"><path d="M-20 221H245L370 194H820M103-10v158l51 68v272M469-20v145l73 98v285M-20 392h261l92-54h452"/></g>
+                <path d="M200 326 278 323 355 210 424 182 532 205 632 298" fill="none" stroke="#cf6873" stroke-opacity=".45" stroke-width="2" stroke-dasharray="4 7"/>
+                <g font-family="monospace" font-size="10" fill="#6f8394" letter-spacing="3"><text x="63" y="127">OLD TOWN</text><text x="373" y="60">NIGHT MARKET</text><text x="573" y="430">EAST GATE</text></g>
+                <g stroke="#b8b7aa" stroke-opacity=".35" fill="none"><path d="M728 44v43m-15-25h30"/><path d="m724 50 4-10 4 10"/></g><text x="724" y="31" fill="#b8b7aa" font-size="9" font-family="monospace">N</text>
+              </svg>
+              <div class="map-stamp">夜 <span>ТЕРРИТОРИЯ КЛАНОВ</span></div>
+              <div id="raid-nodes"></div>
+              <div class="map-legend"><span><i></i> ЦЕЛЬ НАБЕГА</span><span><i class="cleared-dot"></i> УЖЕ ЗАЧИЩАЛИ</span></div>
+            </div>
+            <aside class="raid-brief" aria-live="polite">
+              <div class="brief-top"><span id="raid-code">ЦЕЛЬ 01</span><span id="raid-threat" class="threat-pips"></span></div>
+              <span class="faction-name" id="raid-faction"></span><h3 id="raid-name"></h3><p id="raid-description"></p>
+              <dl class="raid-facts"><div><dt>СЛОЖНОСТЬ</dt><dd id="raid-difficulty"></dd></div><div><dt>ПРОТИВНИКИ</dt><dd><strong id="raid-enemy-count"></strong> <span>всего</span></dd></div></dl>
+              <div class="enemy-breakdown" id="raid-enemy-types"></div>
+              <details class="trap-brief"><summary id="raid-traps"></summary><p>Перед срабатыванием ловушка мигает. Из-под балки отойди; шипы перепрыгни или дождись, пока спрячутся. Мину можно перепрыгнуть, покинуть радиус взрыва или обезвредить ударом. Ловушки опасны и для врагов.</p></details>
+              <div class="raid-reward"><span id="raid-reward-label">ДОБЫЧА ПРИ УДАЧЕ</span><strong><svg class="cup-icon" aria-hidden="true"><use href="#chaire-icon"/></svg> <span id="raid-reward-value">1</span> <small>тяирэ</small></strong></div>
+              <div class="loot-chance"><span>ШАНС СЕГОДНЯ</span><strong id="raid-loot-chance"></strong></div>
+              <div class="loot-chance-track" aria-hidden="true"><span id="loot-chance-fill"></span></div>
+              <p class="loot-bonus" id="raid-loot-bonus"></p>
+              <p class="loot-buff hidden" id="raid-loot-buff">Двойной трофей: количество уже ×2. Шанс прежний.</p>
+              <details class="loot-details"><summary>Как выпадает добыча</summary><p id="raid-loot-distribution"></p><p id="raid-loot-rules"></p></details>
+              <button class="primary-button" id="raid-start-button">НАЧАТЬ НАБЕГ <span>↗</span></button>
+              <div class="raid-cleared" id="raid-cleared">РАЙОН ЕЩЁ НЕ ЗАЧИЩЕН</div>
+            </aside>
+          </div>
+          <div class="hub-bottom"><span>СНАРЯЖЕНИЕ <b id="map-equipped">Катана</b></span><span>Повторные зачистки тоже дают шанс на добычу.</span></div>
+        </div>
+        <div id="shop-pane" class="hidden">
+          <div class="hub-heading"><div><div class="eyebrow">ХОРОШЕМУ КЛИНКУ НУЖНЫ ХОРОШИЕ РУКИ</div><h2>Цена тишины<span>.</span></h2></div><p>Оружие и амулеты — навсегда.<br>Расходники покупаются поштучно.</p></div>
+          <div class="shop-loadout"><span>В РУКАХ <b id="shop-equipped"></b></span><button class="text-button" id="equip-default-button">БИТЬСЯ БЕЗ ОРУЖИЯ</button></div>
+          <p id="shop-feedback" class="shop-feedback" role="status" aria-live="polite"></p>
+          <div id="shop-catalog" class="shop-catalog"></div>
+          <button class="secondary-button hidden" data-skip-work>ПРОПУСТИТЬ СМЕНУ ПО ГРАМОТЕ</button>
+          <p class="shop-day-status" id="shop-day-status"></p><div class="hub-bottom"><span>ТВОЙ БАЛАНС <b><span data-balance>0</span> тяирэ</b></span><div class="shop-navigation"><button class="text-button" id="shop-continue-button">ПРОДОЛЖИТЬ ДЕНЬ →</button><button class="text-button" id="shop-map-button">КАРТА НАБЕГОВ →</button></div></div>
+        </div>
+        <p class="save-note" id="save-note">Баланс и оружие сохраняются в этом браузере.</p>
+      </div>
+    </section>
+
+    <section id="hud" class="hud hidden" aria-label="Статус игры">
+      <div id="boss-hud" class="boss-hud hidden"><div class="boss-heading"><strong id="boss-name"></strong><span id="boss-phase"></span></div><div id="boss-health" class="boss-health" role="progressbar" aria-label="Здоровье босса" aria-valuemin="0"><div id="boss-health-fill"></div></div><div class="boss-caption"><span id="boss-hp"></span></div></div>
+      <div class="player-info"><div class="hud-overline">ТЕНЬ <span id="health-label">2 / 2</span></div><div id="health" class="health-bar"></div><div class="dash-track" id="dash-track"><div id="dash-fill"></div></div><span class="dash-caption" id="dash-label">РЫВОК ГОТОВ</span><div class="combat-items"><span id="shuriken-status"></span><span id="potion-status"></span><span id="ronin-status" class="hidden"></span></div><div class="active-buff hidden" id="active-buff"><span id="active-buff-icon"></span><span id="active-buff-name"></span></div><div class="buff-caption hidden" id="active-buff-caption"></div></div>
+      <div class="level-info"><span id="level-number">ГЛАВА 01 / 24</span><strong id="level-name">Старый квартал</strong><div class="level-progress"><div id="level-fill"></div></div></div>
+      <div class="objective"><span class="hud-overline">ОСТАЛОСЬ ВРАГОВ</span><strong><span id="remaining">08</span><span class="enemy-symbol">斬</span></strong></div>
+      <div class="combo hidden" id="combo"><strong id="combo-number">2</strong><span>СЕРИЯ</span></div>
+      <div class="chapter-toast hidden" id="chapter-toast"><span id="chapter-toast-small">ГЛАВА 01</span><strong id="chapter-toast-title">Старый квартал</strong><em>Не оставляй никого.</em></div>
+      <div class="enemy-direction hidden" id="enemy-direction"></div>
+    </section>
+
+    <div class="controls-strip hidden" id="controls-strip"><span><kbd>A</kbd><kbd>D</kbd> ДВИЖЕНИЕ</span><span><kbd>SPACE</kbd> <span id="jump-control">ПРЫЖОК</span></span><span><kbd>J</kbd> / <kbd>ЛКМ</kbd> <span id="equipped-control">КУЛАКИ</span></span><span id="dash-control"><kbd>SHIFT</kbd> РЫВОК</span><span><kbd>ESC</kbd> ПАУЗА</span></div>
+    <div class="touch-controls hidden" id="touch-controls"><div class="touch-utility"><button data-control="shuriken" aria-label="Бросить сюрикен ветра">風 <small id="touch-shuriken-count">0</small></button><button data-control="heal" aria-label="Выпить зелье здоровья">薬 <small id="touch-potion-count">0</small></button><button data-control="execute" aria-label="Добивание ронина">Q</button></div><div><button data-control="left" aria-label="Влево">←</button><button data-control="right" aria-label="Вправо">→</button></div><div><button data-control="dash" aria-label="Рывок">⇢</button><button data-control="jump" aria-label="Прыжок">↑</button><button data-control="attack" class="touch-attack" aria-label="Удар">刀</button></div></div>
+
+    <section class="screen modal-screen hidden" id="pause-screen" aria-labelledby="pause-title"><div class="modal"><div class="eyebrow">ПЕРЕВЕДИ ДУХ</div><h2 id="pause-title">Тишина<br>перед бурей<span>.</span></h2><p>Тень может подождать.<br>Выход завершит день и израсходует баф.</p><button class="primary-button" id="resume-button">ПРОДОЛЖИТЬ <span>→</span></button><button class="secondary-button" id="restart-button">ЗАКОНЧИТЬ ДЕНЬ И НА РАБОТУ</button><button class="text-button" id="menu-button">ПРЕРВАТЬ НАБЕГ</button></div></section>
+    <section class="screen modal-screen hidden" id="result-screen" aria-labelledby="result-title"><div class="modal result-modal"><div class="result-seal" id="result-seal">斬</div><div class="eyebrow" id="result-eyebrow">НИ ОДНОГО СВИДЕТЕЛЯ</div><h2 id="result-title">Квартал зачищен<span>.</span></h2><p id="result-description">Впереди ещё одна ночь.</p><div class="result-stats"><div><span>УСТРАНЕНО</span><strong id="stat-kills">8 / 8</strong></div><div><span>ВРЕМЯ</span><strong id="stat-time">00:42</strong></div><div><span>ЛУЧШАЯ СЕРИЯ</span><strong id="stat-combo">× 4</strong></div></div><div class="result-reward hidden" id="result-reward"><svg class="cup-icon" aria-hidden="true"><use href="#chaire-icon"/></svg><strong id="reward-amount">+1 тяирэ</strong><span id="reward-balance"></span></div><p class="result-loot-note hidden" id="result-loot-note"></p><button class="primary-button" id="next-button">К КАРТЕ НАБЕГОВ <span>→</span></button><button class="secondary-button" id="result-shop-button">МАГАЗИН <span>→</span></button><button class="text-button" id="result-menu-button">В ГЛАВНОЕ МЕНЮ</button></div></section>
+    <div id="live-status" class="sr-only" role="status" aria-live="polite"></div>
+  </main>
+  <script src="world-content.js"></script>
+  <script src="traps.js"></script>
+  <script src="bosses.js"></script>
+  <script src="okusan-quotes.js"></script>
+  <script src="engine.js"></script>
+  <script src="campaign.js"></script>
+  <script src="hub.js"></script>
+  <script src="kitchen-core.js"></script>
+  <script src="kitchen-ui.js"></script>
+  <script src="landscape-art.js"></script>
+  <script src="biome-art.js"></script>
+  <script src="okusan.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+{
+  "name": "bushido",
+  "version": "0.10.0",
+  "private": true,
+  "description": "A dependency-free voxel ninja platformer",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test tests/engine.test.js tests/campaign.test.js tests/kitchen.test.js tests/ai.test.js tests/expansion.test.js tests/layout-traps.test.js tests/bosses.test.js tests/equipment.test.js",
+    "check": "node --check engine.js && node --check campaign.js && node --check hub.js && node --check game.js && node --check kitchen-core.js && node --check kitchen-ui.js && node --check server.js && node --check world-content.js && node --check okusan.js && node --check okusan-quotes.js && node --check biome-art.js && node --check traps.js && node --check bosses.js && node --check landscape-art.js"
+  }
+}
